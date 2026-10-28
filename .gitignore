@@ -1,0 +1,28 @@
+# Node
+node_modules/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Env / secrets
+.env
+.env.*
+*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Build artifacts (проект — zero-build, но на будущее)
+dist/
+build/
+
+# Временное
+.tmp/
