@@ -4,6 +4,9 @@
 
 # KARAOKE DREAM 2.0
 
+<p align="center"><img src=".github/social-preview.png" alt="karaoke-dream" width="100%"></p>
+
+
 **Браузерное караоке мечты: неон, гид-вокал, оценка голоса в реальном времени и «Зелёный коридор» — среда подстраивается под певца, а не певец под среду.**
 
 [![CI](https://github.com/rtynbirf/karaoke-dream/actions/workflows/ci.yml/badge.svg)](https://github.com/rtynbirf/karaoke-dream/actions/workflows/ci.yml)
