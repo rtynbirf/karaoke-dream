@@ -1,0 +1,18 @@
+name: profile-gate
+# Волна ×3 · W3-E · Гейт профиля певца и гистерезиса коридора (karaoke-dream#3).
+# Прогон юнит-тестов на предустановленном в раннере Node (без сторонних экшенов).
+# Существующие ci.yml и src/ не тронуты — только новые файлы.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Юнит-тесты профиля, калибровки и гистерезиса коридора
+        run: node --test tests/corridor-profile.test.mjs
