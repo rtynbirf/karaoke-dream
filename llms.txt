@@ -1,0 +1,37 @@
+# karaoke-dream
+> Браузерное караоке мечты: неон, гид-вокал, оценка голоса в реальном времени и Зелёный коридор — тональность подстраивается под певца. Vanilla JS + WebAudio, zero-dependency.
+
+Автоген 2026-11-08 · источник: живой GitHub API (номера и файлы не руками) · владелец rtynbirf · ветка `main`
+
+## Мембрана
+- README.md — для человека (KARAOKE DREAM 2.0)
+- AGENTS.md — есть
+- LICENSE — MIT
+- topics: dsp, enhanced-lrc, karaoke, lrc, music, neon, pitch-detection, ruvson, singing, vanilla-js, web-app, webaudio, yin
+
+## Карта корня
+- .editorconfig
+- .gitattributes
+- .github/
+- .gitignore
+- AGENTS.md
+- CHANGELOG.md
+- CODEOWNERS
+- CODE_OF_CONDUCT.md
+- CONTRIBUTING.md
+- LICENSE
+- PULSE.md
+- README.md
+- SECURITY.md
+- docs/
+- index.html
+- … ещё 5
+
+## CI
+- workflow: ci
+- workflow: self-audit
+
+## Ссылки
+- [GitHub](https://github.com/rtynbirf/karaoke-dream)
+- [README](https://github.com/rtynbirf/karaoke-dream/blob/main/README.md)
+- [raw llms.txt](https://raw.githubusercontent.com/rtynbirf/karaoke-dream/main/llms.txt)
