@@ -1,4 +1,8 @@
 <div align="center">
+  <img src="banner.png" alt="karaoke-dream — Браузерное караоке мечты: неон, гид-вокал, оценка голоса" width="100%">
+</div>
+
+<div align="center">
 
 <img src="public/logo.svg" alt="KARAOKE DREAM 2.0 — Неоновый вектор" width="100%">
 
