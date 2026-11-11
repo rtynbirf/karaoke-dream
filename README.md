@@ -2,6 +2,15 @@
   <img src="banner.png" alt="karaoke-dream — Браузерное караоке мечты: неон, гид-вокал, оценка голоса" width="100%">
 </div>
 
+<!--ФОРЖ:МУЗА:НАЧАЛО-->
+<div align="center">
+  <img src="repo-muse.svg" width="100%" alt="Муза karaoke-dream: картина кузни ПОЛИМАТ, раунд 9" />
+  <br/>
+  <img src="forge-divider.svg" width="62%" alt="разделитель кузни ПОЛИМАТ" />
+</div>
+<!--ФОРЖ:МУЗА:КОНЕЦ-->
+
+
 <div align="center">
 
 <img src="public/logo.svg" alt="KARAOKE DREAM 2.0 — Неоновый вектор" width="100%">
@@ -132,4 +141,11 @@ MIT — [`LICENSE`](LICENSE).
 
 *«Я пою там, где тренды молчат» — демо-песня прототипа.*
 
+</div>
+
+<!--ФОРЖ:ПОДВАЛ-->
+---
+
+<div align="center">
+  <sub>◆ картина и штандарт — ручная ковка <a href="https://github.com/rtynbirf">КУЗНИ ПОЛИМАТ</a> · ЧЕЛОВЕК=АККАУНТ=PID1 ◆</sub>
 </div>
