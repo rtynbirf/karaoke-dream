@@ -4,11 +4,12 @@
 
 <!--ФОРЖ:МУЗА:НАЧАЛО-->
 <div align="center">
-  <img src="repo-muse.svg" width="100%" alt="Муза karaoke-dream: картина кузни ПОЛИМАТ, раунд 9" />
+  <img src="repo-muse.svg" width="100%" alt="Муза karaoke-dream: мастерская СЦЕНА СОФИТОВ, кузня ПОЛИМАТ, раунд 11" />
   <br/>
-  <img src="forge-divider.svg" width="62%" alt="разделитель кузни ПОЛИМАТ" />
+  <img src="forge-divider.svg" width="62%" alt="делитель мастерской СЦЕНА СОФИТОВ" />
 </div>
 <!--ФОРЖ:МУЗА:КОНЕЦ-->
+
 
 
 <div align="center">
