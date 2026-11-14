@@ -92,7 +92,23 @@ input[type=range]{accent-color:var(--cyan);width:100%}
 .toast{background:#0d0e1c;border:1px solid var(--cyan);padding:9px 14px;border-radius:10px;font-size:.85rem;max-width:340px}
 .toast.warn{border-color:var(--amber)}
 .hidden{display:none!important}
+.howto ol{margin:8px 0 0 20px;display:flex;flex-direction:column;gap:7px;font-size:.86rem;color:var(--dim)}
+.howto li b{color:var(--ink)}
+.howto p{margin-top:10px}
+.ruv-list{display:flex;flex-direction:column;gap:6px;max-height:430px;overflow:auto;padding-right:4px}
+.ruv-row{display:grid;grid-template-columns:44px 1fr 52px auto;gap:8px 10px;align-items:center;background:rgba(10,11,24,.55);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.ruv-num{color:var(--mag);font-weight:800;font-size:.8rem}
+.ruv-tit{font-weight:700;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ruv-len{color:var(--dim);font-size:.78rem}
+.ruv-badges{display:flex;gap:6px;flex-wrap:wrap}
+.ruv-btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.ruv-btns .btn{padding:6px 12px;font-size:.78rem;border-radius:10px}
+.ruv-label{color:var(--cyan);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;margin-top:8px}
+.ruv-lyr{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:.85rem;color:var(--dim);display:flex;flex-direction:column;gap:3px}
+.ruv-lyr div[data-syncline].hit{color:var(--ink);font-weight:800;text-shadow:0 0 10px rgba(34,211,238,.6)}
+.ruv-lyr div[data-syncline].done{color:var(--green)}
 @media (max-width:640px){#roll{height:220px}.hud .chip.lat,.hud .chip.mode{display:none}}
+@media (max-width:640px){.ruv-row{grid-template-columns:34px 1fr auto}.ruv-len{display:none}}
 </style>
 </head>
 <body>
@@ -107,6 +123,7 @@ input[type=range]{accent-color:var(--cyan);width:100%}
 <main id="app"></main>
 <footer class="foot">WebAudio · YIN · офлайн: звук и голос обрабатываются локально, ничего не уходит в сеть · осколок вселенной <a href="https://rtynbirf.github.io/singulyar/" target="_blank" rel="noopener">СИНГУЛЯР</a> · полный репо: <a href="https://rtynbirf.github.io/karaoke-dream/" target="_blank" rel="noopener">KARAOKE DREAM 2.0</a></footer>
 <div id="toasts" aria-live="polite"></div>
+<script src="ruvson-catalog.js"></script>
 <script>
 'use strict';
 /* =======================================================================
@@ -118,7 +135,11 @@ input[type=range]{accent-color:var(--cyan);width:100%}
    2) компенсация задержки микрофона (авто-оценка + ручная подстройка);
    3) вторая песня «157 голосов» — эхо флагмана СИНГУЛЯРА;
    4) зал: очередь и ноосфера-рекорды (localStorage);
-   5) живой реверб голоса (Эхо сцены) и раздельные громкости слоёв.
+   5) живой реверб голоса (Эхо сцены) и раздельные громкости слоёв;
+   6) каталог RUVSON целиком (все 63 трека, ruvson-catalog.js — собран из
+      rtynbirf/ruvson-lyrics): у 01-05 реальные минусы из архива + базовые
+      тайминги строк, у остальных — текст без выдуманных меток + режим «Синхро»
+      (разметка строк тапом, хранится в localStorage) + ссылки на YouTube.
    ======================================================================= */
 
 /* ---------- утилиты ---------- */
@@ -593,7 +614,11 @@ const S = {
   raf: 0, tick: 0, paused: false, ended: false, hold: 0,
   lineIdx: -1, lineResults: [], scoredCount: 0,
 };
-const LS_REC = 'ik.records.v1', LS_Q = 'ik.queue.v1';
+const LS_REC = 'ik.records.v1', LS_Q = 'ik.queue.v1', LS_SYNC = 'ik.ruvson.sync.v1';
+/* каталог RUVSON (ruvson-catalog.js подключается соседним файлом; если его нет — работают две встроенные песни) */
+const ruvTracks = () => (window.RUVSON && window.RUVSON.tracks) || [];
+const ruvFind = (num) => ruvTracks().find((t) => t.num === +num);
+const getSync = () => loadLS(LS_SYNC, {});
 const loadLS = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
 const saveLS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
 const getQueue = () => loadLS(LS_Q, []);
@@ -640,6 +665,13 @@ function renderHome() {
         '<input type="text" id="name-in" placeholder="Имя в зале" maxlength="24" style="max-width:180px">' +
       '</div>' +
     '</section>' +
+    '<div class="card howto"><h3>КАК ЮЗАТЬ — 5 шагов</h3><ol>' +
+      '<li><b>Выбери песню.</b> Встроенные две — старт мгновенно (минус и гид синтезируются в браузере). Каталог RUVSON — все 63 трека: у 01–05 минус и тайминги лежат в архиве, у остальных текст размечается тапом в «Синхро» (пара минут). Или свой mp3 + LRC.</li>' +
+      '<li><b>Нажми «Включить микрофон и начать».</b> Браузер спросит доступ к микрофону — разреши; откажешься — пойдёшь зрителем: сцена живёт, судья честно молчит. Наушники обязательны, иначе эхо врёт.</li>' +
+      '<li><b>Пой в свою октаву</b> — судья заворачивает разницу в ±600 центов. Просадил строку — «Зелёный коридор» спустит тональность до -3 пт и вернёт оригинал, когда выровняешься.</li>' +
+      '<li><b>Подстрой задержку</b> ползунком «задержка, мс», если кривая голоса стабильно убегает или отстаёт от подсветки.</li>' +
+      '<li><b>Зал:</b> «В зал» ставит песню в очередь; впиши имя — рекорды останутся в «Ноосфере зала» (localStorage, офлайн).</li>' +
+    '</ol><p>Голос не покидает устройство: весь звук и анализ — локально. Автоплей браузеры блокируют: звук всегда стартует твоим нажатием.</p></div>' +
     '<div class="sub">шесть принципов идеальности</div>' +
     '<div class="grid">' +
       principle('01', 'Синхрон', 'по-слоговая подсветка слов и компенсация задержки микрофона: авто-оценка + ручная подстройка — кривая голоса ложится на плашку нот') +
@@ -656,6 +688,11 @@ function renderHome() {
         '<textarea id="lrc-in" placeholder="[00:05.00]Первая строка&#10;[00:09.00]<00:05.00>Вто <00:06.00>рая — по-словно"></textarea>' +
         '<label class="row" style="font-size:.8rem;color:var(--dim)"><input type="checkbox" id="cut-cb"> убрать вокал (центр-канал)</label>' +
         '<div class="row grow"><button class="btn mag" id="custom-go">Свой трек: на сцену</button></div></div>' +
+    '</div>' +
+    '<div class="sub" id="ruv-sub">каталог RUVSON · ' + ruvTracks().length + ' треков целиком</div>' +
+    '<div class="card">' +
+      '<div class="row"><input type="search" id="ruv-q" placeholder="поиск: номер или часть названия" style="flex:1;min-width:220px"><a class="btn ghost" href="https://rtynbirf.github.io/ruvson-lyrics/" target="_blank" rel="noopener">источник текстов</a></div>' +
+      '<div id="ruv-list" class="ruv-list"></div>' +
     '</div>' +
     '<div class="sub">зал</div>' +
     '<div class="grid"><div class="card"><h3>Очередь зала</h3><div class="recs grow" id="queue-box"></div></div>' +
@@ -677,13 +714,14 @@ function renderHome() {
   $('#custom-go').addEventListener('click', launchCustom);
   $('#man-del').addEventListener('input', (e) => { S.manDelayMs = +e.target.value; $('#man-lab').textContent = S.manDelayMs + ' мс'; renderChips(); });
   $('#recs-clear').addEventListener('click', () => { localStorage.removeItem(LS_REC); renderHome(); });
+  renderRuvList();
   drawQueue(); drawRecords(); renderChips();
 }
 function drawQueue() {
   const box = $('#queue-box'); if (!box) return;
   const q = getQueue();
   box.innerHTML = q.length
-    ? q.map((id, i) => { const s = SONGS.find((x) => x.id === id); return '<span>' + (i + 1) + '. ' + esc(s ? s.meta.ti : id) + ' <button class="btn ghost" data-unq="' + i + '" style="padding:2px 8px;font-size:.7rem">убрать</button></span>'; }).join('')
+    ? q.map((id, i) => { const s = SONGS.find((x) => x.id === id); const nm = s ? s.meta.ti : ruvName(id); return '<span>' + (i + 1) + '. ' + esc(nm) + ' <button class="btn ghost" data-unq="' + i + '" style="padding:2px 8px;font-size:.7rem">убрать</button></span>'; }).join('')
     : '<span>зал пуст — поставь песню кнопкой «В зал»</span>';
   box.querySelectorAll('[data-unq]').forEach((b) => b.addEventListener('click', () => {
     const q2 = getQueue(); q2.splice(+b.dataset.unq, 1); saveLS(LS_Q, q2); drawQueue();
@@ -697,6 +735,13 @@ function drawRecords() {
     return '<span style="color:var(--ink)">' + esc(s.meta.ti) + '</span>' + (r.length
       ? r.map((x) => '<span><b>' + x.s + '%</b> · ' + esc(x.n || 'Гость') + ' · ' + esc(x.d) + '</span>').join('')
       : '<span>— тишина ждёт первого голоса</span>');
+  });
+  Object.keys(recs).filter((k) => k.startsWith('ruvson-')).forEach((k) => {
+    const t = ruvFind(+k.slice(7)); if (!t) return;
+    const r = recs[k] || [];
+    rows.push('<span style="color:var(--ink)">' + esc('#' + String(t.num).padStart(2, '0') + ' · ' + t.title) + '</span>' + (r.length
+      ? r.map((x) => '<span><b>' + x.s + '%</b> · ' + esc(x.n || 'Гость') + ' · ' + esc(x.d) + '</span>').join('')
+      : '<span>— тишина ждёт первого голоса</span>'));
   });
   box.innerHTML = rows.join('');
 }
@@ -723,6 +768,233 @@ async function launchCustom() {
   const parsed = parseLRC(lrcText);
   const tl = parsed.length ? lrcToTimeline(parsed, buf.duration) : { duration: buf.duration, lines: [], hasRef: false, chords: [] };
   startStage(song, tl, buf, null, false, parsed.length === 0);
+}
+/* ---------- каталог RUVSON: все треки, целиком ---------- */
+function ruvName(id) {
+  if (!id.startsWith('ruvson-')) return id;
+  const t = ruvFind(+id.slice(7));
+  return t ? '#' + String(t.num).padStart(2, '0') + ' ' + t.title : id;
+}
+function ruvStatusBadge(t) {
+  const synced = getSync()[t.num];
+  if (synced && synced.length) return '<span class="chip">текст</span><span class="chip ok">размечено тобой: ' + synced.length + ' строк</span>';
+  if (t.minus && t.timed) return '<span class="chip ok">минус в архиве</span><span class="chip">базовые тайминги</span>';
+  return '<span class="chip">текст</span><span class="chip warn">без таймингов — Синхро</span>';
+}
+function renderRuvList() {
+  const box = $('#ruv-list'); if (!box) return;
+  const q = $('#ruv-q') ? $('#ruv-q').value.trim().toLowerCase() : '';
+  const rows = ruvTracks().filter((t) => !q || t.title.toLowerCase().includes(q) || String(t.num) === q.replace('#', '')).map((t) =>
+    '<div class="ruv-row">' +
+      '<span class="ruv-num">#' + String(t.num).padStart(2, '0') + '</span>' +
+      '<span class="ruv-tit">' + esc(t.title) + '</span>' +
+      '<span class="ruv-len">' + esc(t.length) + '</span>' +
+      '<span class="ruv-badges">' + ruvStatusBadge(t) + '</span>' +
+      '<span class="ruv-btns">' +
+        '<button class="btn" data-ruv-sing="' + t.num + '">На сцену</button>' +
+        '<button class="btn ghost" data-ruv-sync="' + t.num + '">Синхро</button>' +
+        (t.youtube ? '<a class="btn ghost" href="https://youtu.be/' + esc(t.youtube) + '" target="_blank" rel="noopener" title="оригинал на YouTube">▶</a>' : '') +
+      '</span>' +
+    '</div>').join('');
+  box.innerHTML = rows || '<p style="color:var(--dim)">не нашлось — попробуй номер (18) или часть названия</p>';
+  box.querySelectorAll('[data-ruv-sing]').forEach((b) => b.addEventListener('click', () => renderRuvTrack(+b.dataset.ruvSing)));
+  box.querySelectorAll('[data-ruv-sync]').forEach((b) => b.addEventListener('click', () => renderRuvSync(+b.dataset.ruvSync)));
+}
+function parseUnsynced(text) {
+  const out = [];
+  let label = null;
+  String(text || '').split(/\r?\n/).forEach((raw) => {
+    let s = raw.trim();
+    if (!s) return;
+    const lm = /^\[label:(.+)\]$/i.exec(s);
+    if (lm) { label = lm[1].trim(); return; }
+    if (/^\[[a-z]+:.*\]$/i.test(s)) return;
+    const tm = /^\[\d{1,2}:\d{2}(?:[.:]\d{1,3})?\]/.exec(s);
+    if (tm) s = s.slice(tm[0].length).trim();
+    s = s.replace(/<\d{1,2}:\d{2}(?:[.:]\d{1,3})?>/g, '').trim();
+    if (!s) return;
+    out.push({ text: s, label });
+    label = null;
+  });
+  return out;
+}
+function distributeWords(text, t0, t1) {
+  const words = String(text).split(/\s+/).filter(Boolean);
+  const weights = words.map((w) => Math.max(1, (w.match(/[аеёиоуыэюяaeiouy]/gi) || []).length));
+  const total = weights.reduce((a, b) => a + b, 0) || 1;
+  const lead = (t1 - t0) * 0.9;
+  let t = t0;
+  return words.map((w, i) => {
+    const d = (lead * weights[i]) / total;
+    const obj = { text: w, start: t, end: t + Math.max(0.2, d - 0.04), midi: null, score: null };
+    t += d; return obj;
+  });
+}
+function buildTimelineFromStarts(rawLines, starts, duration) {
+  const lines = rawLines.map((l, i) => {
+    const start = starts[i];
+    const end = i + 1 < starts.length ? Math.max(start + 0.6, starts[i + 1] - 0.12) : Math.max(start + 0.6, duration - 0.4);
+    return { start, end, text: l.text, words: distributeWords(l.text, start, end) };
+  });
+  return { duration, lines, hasRef: false, chords: [] };
+}
+async function ruvFetchMinus(t) {
+  if (!t.minus) return null;
+  const ctx = ensureCtx();
+  try {
+    const r = await fetch(t.minus);
+    if (!r.ok) return null;
+    return await ctx.decodeAudioData(await r.arrayBuffer());
+  } catch (e) { return null; }
+}
+function renderRuvTrack(num) {
+  const t = ruvFind(num);
+  if (!t) { toast('Трек #' + num + ' не найден в каталоге', true); renderHome(); return; }
+  S.screen = 'ruvtrack'; stopLoop(); stopSources();
+  const lines = parseUnsynced(t.lrc);
+  const lyricHtml = lines.map((l) => (l.label ? '<div class="ruv-label">' + esc(l.label) + '</div>' : '') + '<div>' + esc(l.text) + '</div>').join('');
+  $('#app').innerHTML =
+    '<div class="card ruv-track">' +
+      '<div class="row"><button class="btn ghost" id="ruv-back">← Каталог</button><span class="title">#' + String(t.num).padStart(2, '0') + ' · ' + esc(t.title) + '</span></div>' +
+      '<p>' + esc(t.length) + ' · ' + ruvStatusBadge(t) + (t.youtube ? ' · <a href="https://youtu.be/' + esc(t.youtube) + '" target="_blank" rel="noopener">оригинал на YouTube</a>' : '') + '</p>' +
+      '<p>Тайминги не выдумываются: ' + (t.timed
+        ? 'у трека есть базовые метки строк из станка ruvson-lyrics (подправить можно тапом в «Синхро»).'
+        : ((getSync()[t.num] && getSync()[t.num].length)
+          ? 'разметка строк сделана тобой в этом браузере — можно править.'
+          : 'меток ещё нет: включи «Синхро», запусти звук и тапай в начале каждой строки (пробел или кнопка ТАП) — секунда на строку.')) + '</p>' +
+      '<div class="row">' +
+        (t.minus ? '<button class="btn mag" id="ruv-sing-minus">Пой с минусом из архива</button>' : '') +
+        '<button class="btn" id="ruv-sing-file">Пой со своим файлом</button>' +
+        '<button class="btn ghost" id="ruv-go-sync">Синхро: разметить строки</button>' +
+      '</div>' +
+      '<label class="row" id="ruv-file-row" style="display:none">свой звук: <input type="file" id="ruv-file" accept="audio/*"></label>' +
+      '<div class="ruv-lyr">' + lyricHtml + '</div>' +
+    '</div>';
+  $('#ruv-back').addEventListener('click', exitToHome);
+  const sm = $('#ruv-sing-minus');
+  if (sm) sm.addEventListener('click', () => singRuvson(num, null));
+  $('#ruv-sing-file').addEventListener('click', () => singRuvson(num, 'need'));
+  $('#ruv-go-sync').addEventListener('click', () => renderRuvSync(num));
+  $('#ruv-file').addEventListener('change', (e) => { if (e.target.files && e.target.files[0]) singRuvson(num, e.target.files[0]); });
+}
+async function singRuvson(num, file) {
+  const t = ruvFind(num);
+  if (!t) return;
+  if (file === 'need') { const row = $('#ruv-file-row'); row.style.display = 'flex'; $('#ruv-file').click(); return; }
+  if (!file && !t.minus) { toast('У этого трека минуса нет в архиве — выбери свой аудиофайл', true); const row = $('#ruv-file-row'); row.style.display = 'flex'; return; }
+  toast('Декодирую звук…');
+  const ctx = ensureCtx();
+  let buf = null;
+  if (file) { try { buf = await ctx.decodeAudioData(await file.arrayBuffer()); } catch (e) { toast('Файл не декодировался: ' + e.message, true); return; } }
+  else { buf = await ruvFetchMinus(t); }
+  if (!buf) { toast('Минус из архива недоступен (офлайн?) — выбери свой аудиофайл', true); const row = $('#ruv-file-row'); row.style.display = 'flex'; return; }
+  const rawLines = parseUnsynced(t.lrc);
+  const starts = getSync()[t.num];
+  let tl;
+  if (starts && starts.length === rawLines.length) tl = buildTimelineFromStarts(rawLines, starts, buf.duration);
+  else {
+    const parsed = parseLRC(t.lrc);
+    if (!parsed.length) { toast('Меток строк нет — сначала разметь в «Синхро»', true); renderRuvSync(num); return; }
+    tl = lrcToTimeline(parsed, buf.duration);
+  }
+  const song = { id: 'ruvson-' + t.num, meta: { ti: t.title, ar: 'RUVSON · #' + String(t.num).padStart(2, '0') } };
+  startStage(song, tl, buf, null, false, false);
+}
+function renderRuvSync(num) {
+  const t = ruvFind(num);
+  if (!t) { renderHome(); return; }
+  S.screen = 'ruvsync'; stopLoop(); stopSources();
+  const lines = parseUnsynced(t.lrc);
+  S.sync = { num: t.num, lines, starts: [], buf: null, live: false };
+  $('#app').innerHTML =
+    '<div class="card ruv-track">' +
+      '<div class="row"><button class="btn ghost" id="ruv-back">← Каталог</button><span class="title">Синхро · #' + String(t.num).padStart(2, '0') + ' · ' + esc(t.title) + '</span></div>' +
+      '<p style="color:var(--dim)">Запусти звук и тапай в начале каждой строки: <b>пробел</b> или кнопка ТАП. Пропустил — «отмена» и тап заново. Разметка сохраняется в этом браузере и правится сколько угодно раз. ' + (t.minus ? 'Минус есть в архиве.' : 'Минуса в архиве нет — нужен свой файл.') + '</p>' +
+      '<div class="row" id="ruv-sync-actions">' +
+        (t.minus ? '<button class="btn mag" id="ruv-sync-minus">Звук из архива</button>' : '') +
+        '<button class="btn" id="ruv-sync-file">Свой файл</button>' +
+        '<button class="btn big mag" id="ruv-tap" disabled>ТАП — начало строки</button>' +
+        '<button class="btn ghost" id="ruv-undo" disabled>отмена</button>' +
+        '<button class="btn ghost" id="ruv-done" disabled>Готово</button>' +
+        '<span class="chip" id="ruv-sync-count">0 / ' + lines.length + '</span>' +
+      '</div>' +
+      '<label class="row" id="ruv-file-row" style="display:none">свой звук: <input type="file" id="ruv-file" accept="audio/*"></label>' +
+      '<div class="ruv-lyr" id="ruv-sync-lyr">' + lines.map((l, i) => (l.label ? '<div class="ruv-label">' + esc(l.label) + '</div>' : '') + '<div data-syncline="' + i + '">' + (i + 1) + '. ' + esc(l.text) + '</div>').join('') + '</div>' +
+    '</div>';
+  $('#ruv-back').addEventListener('click', () => { S.sync = null; renderHome(); });
+  const loadBuf = async (buf) => {
+    S.sync.buf = buf;
+    AE.buffers = buf; AE.guideBuf = null; AE.shift = 0; AE.offset = 0;
+    makeSources(0);
+    S.sync.live = true;
+    ['#ruv-tap', '#ruv-undo', '#ruv-done'].forEach((s2) => { $(s2).disabled = false; });
+    const a = $('#ruv-sync-actions'); if (a) a.insertAdjacentHTML('beforeend', '<span class="chip ok">звук пошёл — тапай в начале строк</span>');
+    toast('Звук пошёл: тапай в начале каждой строки');
+  };
+  const sm2 = $('#ruv-sync-minus');
+  if (sm2) sm2.addEventListener('click', async () => {
+    toast('Загружаю минус из архива…');
+    const buf = await ruvFetchMinus(t);
+    if (!buf) { toast('Минус недоступен — выбери свой файл', true); const row = $('#ruv-file-row'); row.style.display = 'flex'; return; }
+    loadBuf(buf);
+  });
+  $('#ruv-sync-file').addEventListener('click', () => { const row = $('#ruv-file-row'); row.style.display = 'flex'; $('#ruv-file').click(); });
+  $('#ruv-file').addEventListener('change', async (e) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    toast('Декодирую звук…');
+    try { await loadBuf(await ensureCtx().decodeAudioData(await e.target.files[0].arrayBuffer())); }
+    catch (er) { toast('Файл не декодировался: ' + er.message, true); }
+  });
+  $('#ruv-tap').addEventListener('click', ruvTap);
+  $('#ruv-undo').addEventListener('click', ruvUndo);
+  $('#ruv-done').addEventListener('click', ruvFinish);
+}
+function ruvPaintSync() {
+  const box = $('#ruv-sync-lyr'); if (!box || !S.sync) return;
+  const n = S.sync.starts.length;
+  const cnt = $('#ruv-sync-count'); if (cnt) cnt.textContent = n + ' / ' + S.sync.lines.length;
+  box.querySelectorAll('[data-syncline]').forEach((el) => {
+    const i = +el.dataset.syncline;
+    el.classList.toggle('done', i < n);
+    el.classList.toggle('hit', i === n);
+    if (i === n) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+}
+function ruvTap() {
+  if (!S.sync || !S.sync.live || !S.sync.buf) return;
+  if (S.sync.starts.length >= S.sync.lines.length) return;
+  S.sync.starts.push(Math.max(0, songTime()));
+  ruvPaintSync();
+  if (S.sync.starts.length >= S.sync.lines.length) ruvFinish();
+}
+function ruvUndo() {
+  if (!S.sync || !S.sync.starts.length) return;
+  S.sync.starts.pop();
+  ruvPaintSync();
+}
+function ruvFinish() {
+  if (!S.sync || !S.sync.buf) return;
+  if (S.sync.starts.length < S.sync.lines.length) { toast('Разметка не полная (' + S.sync.starts.length + ' из ' + S.sync.lines.length + ') — продолжай тапать', true); return; }
+  stopSources();
+  S.sync.live = false;
+  const t = ruvFind(S.sync.num);
+  const rawLines = S.sync.lines;
+  const starts = S.sync.starts.slice();
+  const buf = S.sync.buf;
+  const all = getSync(); all[t.num] = starts; saveLS(LS_SYNC, all);
+  const acts = $('#ruv-sync-actions');
+  if (acts) {
+    acts.innerHTML = '<span class="chip ok">разметка сохранена: ' + starts.length + ' строк</span>' +
+      '<button class="btn mag" id="ruv-sync-sing">Пой сейчас</button>' +
+      '<button class="btn ghost" id="ruv-sync-home">Каталог</button>';
+    $('#ruv-sync-sing').addEventListener('click', () => {
+      const tl = buildTimelineFromStarts(rawLines, starts, buf.duration);
+      const song = { id: 'ruvson-' + t.num, meta: { ti: t.title, ar: 'RUVSON · #' + String(t.num).padStart(2, '0') } };
+      startStage(song, tl, buf, null, false, false);
+    });
+    $('#ruv-sync-home').addEventListener('click', () => { S.sync = null; renderHome(); });
+  }
+  toast('Разметка сохранена: ' + starts.length + ' строк — можно петь');
 }
 function centerCut(buf) {
   const ctx = AE.ctx;
@@ -1099,13 +1371,15 @@ function finishSong() {
     const q = getQueue();
     const id = q.shift(); saveLS(LS_Q, q);
     const s = SONGS.find((x) => x.id === id);
-    if (s) { exitToHomeSilent(); launchBuiltIn(id); toast('Из зала: ' + s.meta.ti); }
+    if (id.startsWith('ruvson-')) { exitToHomeSilent(); renderHome(); renderRuvTrack(+id.slice(7)); toast('Из зала: трек RUVSON — выбери звук'); }
+    else if (s) { exitToHomeSilent(); launchBuiltIn(id); toast('Из зала: ' + s.meta.ti); }
     else exitToHome();
   });
   $('#r-home').addEventListener('click', exitToHome);
 }
 function launchBuiltInOrCustom() {
   if (S.song.id === 'custom') { exitToHome(); toast('Свой трек: выбери файл снова на главной'); return; }
+  if (S.song.id.startsWith('ruvson-')) { exitToHomeSilent(); renderHome(); renderRuvTrack(+S.song.id.slice(7)); toast('Трек ждёт: выбери звук и снова на сцену'); return; }
   exitToHomeSilent();
   launchBuiltIn(S.song.id);
 }
@@ -1116,6 +1390,10 @@ function exitToHomeSilent() {
 
 /* ---------- запуск ---------- */
 $('#logo-link').addEventListener('click', (e) => { e.preventDefault(); exitToHome(); });
+/* режим Синхро: тап пробелом по всем правилам зала */
+document.addEventListener('keydown', (e) => {
+  if (S.screen === 'ruvsync' && (e.code === 'Space' || e.key === ' ')) { e.preventDefault(); if (S.sync && S.sync.live) ruvTap(); }
+});
 renderHome();
 renderChips();
 </script>
