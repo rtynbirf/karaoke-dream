@@ -1,0 +1,1123 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ИДЕАЛЬНОЕ КАРАОКЕ — прототип-осколок СИНГУЛЯРА</title>
+<meta name="description" content="Однофайловый прототип идеального караоке: YIN-судья, октава-толерантность, Зелёный коридор, компенсация задержки микрофона, синтез минуса в браузере, зал и ноосфера-рекорды. Офлайн, ноль зависимостей, голос не покидает устройство.">
+<meta property="og:title" content="ИДЕАЛЬНОЕ КАРАОКЕ — прототип">
+<meta property="og:description" content="Среда создаёт пространство, где слышен Человек: судья слушает, коридор находит твою тональность, сцена держит свет.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%2307070f'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%2322d3ee' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23ff2bd6'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#07070f;--ink:#eef2ff;--dim:#8b93b8;--cyan:#22d3ee;--mag:#ff2bd6;--green:#34d399;--amber:#fbbf24;--card:#0d0e1c;--line:#1d2040;--r:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.3;animation:drift 22s ease-in-out infinite alternate}
+.b1{width:46vw;height:46vw;left:-10vw;top:-12vh;background:#0ea5e9}
+.b2{width:38vw;height:38vw;right:-8vw;top:24vh;background:#a21caf}
+.b3{width:30vw;height:30vw;left:24vw;bottom:-14vh;background:#0f766e}
+.scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.012) 3px 4px)}
+@keyframes drift{to{transform:translate3d(6vw,4vh,0) scale(1.08)}}
+.topbar{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 18px;background:rgba(7,7,15,.78);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:20}
+.logo{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:800;letter-spacing:.06em;font-size:.95rem}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.chip{font-size:.72rem;padding:3px 9px;border:1px solid var(--line);border-radius:999px;color:var(--dim);white-space:nowrap}
+.chip.ok{color:var(--green);border-color:rgba(52,211,153,.4)}
+.chip.warn{color:var(--amber);border-color:rgba(251,191,36,.4)}
+main{max-width:1060px;margin:0 auto;padding:22px 18px 96px}
+.foot{position:fixed;left:0;right:0;bottom:0;text-align:center;font-size:.72rem;color:var(--dim);padding:9px;background:rgba(7,7,15,.82);border-top:1px solid var(--line);z-index:20}
+.foot a{color:var(--cyan);text-decoration:none}
+.hero{margin:10px 0 6px}
+h1.hero{font-size:clamp(1.6rem,4.6vw,2.6rem);letter-spacing:.05em;margin:4px 0 8px}
+.grad{background:linear-gradient(90deg,var(--cyan),var(--mag));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--dim);max-width:64ch;margin-bottom:18px}
+.lead b{color:var(--ink)}
+.sub{font-size:.8rem;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;margin:22px 0 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px}
+.card h3{font-size:1rem;letter-spacing:.04em}
+.card p{font-size:.85rem;color:var(--dim)}
+.card .grow{flex:1}
+.card.ideal{border-color:rgba(34,211,238,.35)}
+.card.ideal h3{color:var(--cyan)}
+.num{font-size:.72rem;color:var(--mag);letter-spacing:.18em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border-radius:12px;border:1px solid var(--cyan);background:rgba(34,211,238,.08);color:var(--ink);font-weight:700;cursor:pointer;letter-spacing:.03em;font-size:.9rem}
+.btn:hover{background:rgba(34,211,238,.18)}
+.btn.mag{border-color:var(--mag);background:rgba(255,43,214,.1)}
+.btn.mag:hover{background:rgba(255,43,214,.2)}
+.btn.ghost{border-color:var(--line);background:transparent;color:var(--dim)}
+.btn.big{padding:16px 30px;font-size:1.05rem}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.recs{font-size:.78rem;color:var(--dim);display:flex;flex-direction:column;gap:3px}
+.recs b{color:var(--green)}
+select,input[type=text],textarea{background:#0a0b18;border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:8px 10px;font:inherit;font-size:.85rem}
+textarea{width:100%;min-height:110px;resize:vertical}
+input[type=file]{color:var(--dim);font-size:.8rem;max-width:100%}
+input[type=range]{accent-color:var(--cyan);width:100%}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:flex-end;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.ctl label{font-size:.7rem;color:var(--dim);display:flex;flex-direction:column;gap:5px;min-width:110px;flex:1}
+.stage{display:flex;flex-direction:column;gap:10px}
+.stage-top{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.title{font-weight:800;letter-spacing:.04em}
+.hud{display:flex;gap:8px;flex-wrap:wrap}
+.hud .chip{font-size:.78rem}
+#hud-score{font-size:.9rem;font-weight:800}
+#roll{width:100%;height:300px;background:rgba(10,12,28,.72);border:1px solid var(--line);border-radius:var(--r);display:block}
+.lyr{min-height:30px;text-align:center}
+.lyr.prev,.lyr.next{color:var(--dim);font-size:.92rem;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lyr.cur{font-size:clamp(1.15rem,3.4vw,1.75rem);font-weight:800;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lyr.cur .w{margin:0 .16em;border-radius:6px;transition:color .12s}
+.lyr.cur .w.done{color:var(--cyan)}
+.lyr.cur .w.fill{color:#fff;text-shadow:0 0 14px rgba(34,211,238,.85)}
+.lyr.cur .w.todo{color:var(--dim)}
+.lyr.cur .w.good{color:var(--green);text-shadow:0 0 12px rgba(52,211,153,.6)}
+.lyr.cur .w.bad{color:var(--mag);text-shadow:0 0 12px rgba(255,43,214,.6)}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:rgba(7,7,15,.88);z-index:30;text-align:center;padding:20px}
+.overlay h2{font-size:1.3rem;letter-spacing:.05em}
+.overlay p{color:var(--dim);max-width:52ch}
+.res{max-width:720px;margin:0 auto;text-align:center}
+.score-big{font-size:clamp(3rem,9vw,5rem);font-weight:800;line-height:1.1}
+.verdict{color:var(--dim);margin:4px 0 18px}
+.bars{display:flex;flex-direction:column;gap:10px;text-align:left;margin:14px 0}
+.bar-row{display:grid;grid-template-columns:130px 1fr 48px;gap:10px;align-items:center;font-size:.82rem;color:var(--dim)}
+.bar{height:9px;border-radius:6px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:6px}
+.lines-res{text-align:left;font-size:.8rem;color:var(--dim);max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:10px}
+.lines-res div{display:flex;justify-content:space-between;gap:12px;padding:2px 0}
+.lines-res b{color:var(--ink);font-weight:600}
+#toasts{position:fixed;right:14px;bottom:56px;display:flex;flex-direction:column;gap:8px;z-index:50}
+.toast{background:#0d0e1c;border:1px solid var(--cyan);padding:9px 14px;border-radius:10px;font-size:.85rem;max-width:340px}
+.toast.warn{border-color:var(--amber)}
+.hidden{display:none!important}
+@media (max-width:640px){#roll{height:220px}.hud .chip.lat,.hud .chip.mode{display:none}}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="scan"></i></div>
+<header class="topbar">
+  <a class="logo" href="#" id="logo-link" aria-label="На главную">
+    <svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="10" fill="none" stroke="#22d3ee" stroke-width="2"/><circle cx="16" cy="16" r="4" fill="#ff2bd6"/></svg>
+    ИДЕАЛЬНОЕ КАРАОКЕ
+  </a>
+  <div class="chips" id="chips"></div>
+</header>
+<main id="app"></main>
+<footer class="foot">WebAudio · YIN · офлайн: звук и голос обрабатываются локально, ничего не уходит в сеть · осколок вселенной <a href="https://rtynbirf.github.io/singulyar/" target="_blank" rel="noopener">СИНГУЛЯР</a> · полный репо: <a href="https://rtynbirf.github.io/karaoke-dream/" target="_blank" rel="noopener">KARAOKE DREAM 2.0</a></footer>
+<div id="toasts" aria-live="polite"></div>
+<script>
+'use strict';
+/* =======================================================================
+   ИДЕАЛЬНОЕ КАРАОКЕ — прототип-осколок (один файл, ноль зависимостей).
+   Канон унаследован от karaoke-dream 2.0: единый источник правды (из одного
+   описания песни выводятся таймлайн, минус, гид и эталон оценки), YIN-судья
+   на медиане/MAD, Зелёный коридор. Идеальное сверх 2.0:
+   1) октава-толерантный судья — пой в своей октаве, сцена услышит;
+   2) компенсация задержки микрофона (авто-оценка + ручная подстройка);
+   3) вторая песня «157 голосов» — эхо флагмана СИНГУЛЯРА;
+   4) зал: очередь и ноосфера-рекорды (localStorage);
+   5) живой реверб голоса (Эхо сцены) и раздельные громкости слоёв.
+   ======================================================================= */
+
+/* ---------- утилиты ---------- */
+const $ = (s, r) => (r || document).querySelector(s);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
+const midiFromFreq = (f) => 69 + 12 * Math.log2(f / 440);
+const NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const noteName = (m) => { const r = Math.round(m); return NAMES[((r % 12) + 12) % 12] + (Math.floor(r / 12) - 1); };
+function median(arr) { const s = [...arr].sort((a, b) => a - b); const mid = s.length >> 1; return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2; }
+function rmsOf(buf) { let s = 0; for (let i = 0; i < buf.length; i++) s += buf[i] * buf[i]; return Math.sqrt(s / buf.length); }
+function toast(msg, warn) {
+  const box = $('#toasts'); if (!box) return;
+  const el = document.createElement('div');
+  el.className = 'toast' + (warn ? ' warn' : ''); el.textContent = msg;
+  box.appendChild(el); setTimeout(() => el.remove(), 4200);
+}
+
+/* ---------- песни: единый источник правды ---------- */
+const ROOTS = { C: 48, D: 50, E: 52, F: 53, G: 55, A: 57, B: 59 };
+function chordInfo(name) {
+  const m = /^([A-G])(b|#)?(m)?$/i.exec(name);
+  if (!m) return { rootMidi: 57, intervals: [0, 4, 7] };
+  return { rootMidi: ROOTS[m[1].toUpperCase()], intervals: m[3] ? [0, 3, 7] : [0, 4, 7] };
+}
+const SONGS = [
+  {
+    id: 'neon-vector',
+    meta: { ti: 'Неоновый вектор', ar: 'KARAOKE DREAM 2.0' },
+    bpm: 96, beatsPerBar: 4, introBars: 4, tailBars: 2, baseMidi: 62, barsPerLine: 4,
+    chords: ['Am', 'F', 'C', 'G'],
+    lines: [
+      { text: 'Город дышит неоном в темноте', notes: [0, 3, 5, 3, 7, 5, 3, 0] },
+      { text: 'Я иду по стеклянной воде', notes: [7, 5, 3, 0, -2, 0, 3, 5] },
+      { text: 'Фонари считают мои шаги', notes: [5, 7, 5, 3, 0, -2, 0, 3] },
+      { text: 'Каждый вектор найдёт свою волну', notes: [0, 3, 5, 7, 5, 3, 0, -2] },
+      { text: 'Не зови меня в общий поток', notes: [7, 5, 3, 0, -2, 0] },
+      { text: 'У меня свой маршрут и срок', notes: [3, 5, 7, 5, 3, 0] },
+      { text: 'Среда лишь цена за каждый шаг', notes: [0, 2, 3, 5, 3, 2] },
+      { text: 'Я пою там, где тренды молчат', notes: [3, 5, 7, 5, 3, 0] },
+    ],
+  },
+  {
+    id: '157-golosov',
+    meta: { ti: '157 голосов', ar: 'СИНГУЛЯР · Ноосфера' },
+    bpm: 84, beatsPerBar: 4, introBars: 4, tailBars: 2, baseMidi: 60, barsPerLine: 3,
+    chords: ['Am', 'F', 'C', 'G'],
+    lines: [
+      { text: 'Сто пятьдесят семь голосов молчат', notes: [0, 3, 5, 7, 5, 3] },
+      { text: 'В ноосфере тишина не живёт', notes: [5, 7, 9, 7, 5] },
+      { text: 'Каждый голос искали в темноте', notes: [7, 5, 3, 0, -2] },
+      { text: 'Мы считали вслух до одного', notes: [0, 3, 5, 3, 0] },
+      { text: 'Ты вернись и спой со всеми', notes: [0, 2, 3, 5, 3] },
+      { text: 'Человек не цифра на стене', notes: [3, 5, 7, 10, 7] },
+      { text: 'Из огня вернётся наш хор', notes: [5, 3, 0, -2, 0] },
+      { text: 'Пой со мной — и голос вернётся', notes: [0, 3, 5, 7, 10] },
+    ],
+  },
+];
+function buildTimeline(song) {
+  const bar = (60 / song.bpm) * song.beatsPerBar;
+  const lines = song.lines.map((L, li) => {
+    const start = (song.introBars + li * song.barsPerLine) * bar;
+    const end = start + song.barsPerLine * bar - 0.35;
+    const words = L.text.split(/\s+/).filter(Boolean);
+    const weights = words.map((w) => Math.max(1, (w.match(/[аеёиоуыэюяaeiouy]/gi) || []).length));
+    const total = weights.reduce((a, b) => a + b, 0);
+    const lead = (end - start) * 0.86;
+    let t = start;
+    const wordObjs = words.map((text, i) => {
+      const d = (lead * weights[i]) / total;
+      const midi = song.baseMidi + L.notes[i % L.notes.length];
+      const obj = { text, start: t, end: t + Math.max(0.22, d - 0.05), midi, score: null };
+      t += d;
+      return obj;
+    });
+    return { start, end, text: L.text, words: wordObjs };
+  });
+  const totalBars = song.introBars + song.lines.length * song.barsPerLine + song.tailBars;
+  const chords = [];
+  for (let b = 0; b < totalBars; b++) {
+    const info = chordInfo(song.chords[b % song.chords.length]);
+    chords.push({ bar: b, start: b * bar, dur: bar, rootMidi: info.rootMidi, intervals: info.intervals });
+  }
+  return { bar, bpm: song.bpm, duration: totalBars * bar, lines, chords, baseMidi: song.baseMidi, hasRef: true };
+}
+/* Enhanced LRC: [mm:ss.xx]строка и <mm:ss.xx>пословные теги (опционально). */
+function parseLRC(text) {
+  const out = [];
+  const lineRe = /\[(\d{1,2}):(\d{2})(?:[.:](\d{1,3}))?\](.*)/g;
+  let m;
+  while ((m = lineRe.exec(text)) !== null) {
+    const t = (+m[1]) * 60 + (+m[2]) + (m[3] ? +(('0.' + m[3])) : 0);
+    let body = m[4] || '';
+    const words = [];
+    const tagRe = /<(\d{1,2}):(\d{2})(?:[.:](\d{1,3}))?>([^<]*)/g;
+    let w;
+    if (/<\d{1,2}:/.test(body)) {
+      let lastT = null, lastTxt = null;
+      while ((w = tagRe.exec(body)) !== null) {
+        const wt = (+w[1]) * 60 + (+w[2]) + (w[3] ? +(('0.' + w[3])) : 0);
+        if (lastTxt !== null && lastT !== null) words.push({ text: lastTxt.trim(), time: lastT });
+        lastT = wt; lastTxt = w[4];
+      }
+      if (lastTxt !== null && lastT !== null && lastTxt.trim()) words.push({ text: lastTxt.trim(), time: lastT });
+    }
+    if (!words.length) {
+      body.trim().split(/\s+/).filter(Boolean).forEach((x) => words.push({ text: x, time: null }));
+    }
+    if (words.length) out.push({ time: t, text: words.map((x) => x.text).join(' '), words });
+  }
+  out.sort((a, b) => a.time - b.time);
+  return out;
+}
+function lrcToTimeline(parsed, duration) {
+  const lines = parsed.map((l, li) => {
+    const nextT = li + 1 < parsed.length ? parsed[li + 1].time : Math.min(duration, l.time + 5);
+    const end = Math.max(l.time + 0.5, nextT - 0.12);
+    const ws = l.words;
+    let wordObjs;
+    if (ws[0].time != null) {
+      wordObjs = ws.map((w, i) => {
+        const wNext = i + 1 < ws.length ? ws[i + 1].time : end;
+        return { text: w.text, start: w.time, end: Math.max(w.time + 0.2, Math.min(wNext, end) - 0.04), midi: null, score: null };
+      });
+    } else {
+      const weights = ws.map((w) => Math.max(1, (w.text.match(/[аеёиоуыэюяaeiouy]/gi) || []).length));
+      const total = weights.reduce((a, b) => a + b, 0);
+      const lead = (end - l.time) * 0.9;
+      let t = l.time;
+      wordObjs = ws.map((w, i) => {
+        const d = (lead * weights[i]) / total;
+        const obj = { text: w.text, start: t, end: t + Math.max(0.2, d - 0.04), midi: null, score: null };
+        t += d; return obj;
+      });
+    }
+    return { start: l.time, end, text: l.text, words: wordObjs };
+  });
+  return { duration, lines, hasRef: false, chords: [] };
+}
+/* ---------- синтез минуса и гида (офлайн-рендер, канон 2.0) ---------- */
+function makeMaster(ctx) {
+  const master = ctx.createGain(); master.gain.value = 0.9;
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -16; comp.knee.value = 8; comp.ratio.value = 3; comp.attack.value = 0.004; comp.release.value = 0.18;
+  master.connect(comp); comp.connect(ctx.destination);
+  return master;
+}
+function makeNoise(ctx, sampleRate) {
+  const len = Math.ceil(sampleRate * 0.09);
+  const buf = ctx.createBuffer(1, len, sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (len * 0.3));
+  return buf;
+}
+async function renderBacking(tl, { transpose = 0, sampleRate = 44100 } = {}) {
+  const length = Math.ceil((tl.duration + 0.8) * sampleRate);
+  const ctx = new OfflineAudioContext(2, length, sampleRate);
+  const master = makeMaster(ctx);
+  const noise = makeNoise(ctx, sampleRate);
+  for (const ch of tl.chords) {
+    const g = ctx.createGain(); const t0 = ch.start; const t1 = ch.start + ch.dur;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.07, t0 + 0.5);
+    g.gain.setValueAtTime(0.07, Math.max(t0 + 0.5, t1 - 0.35));
+    g.gain.exponentialRampToValueAtTime(0.0001, t1 + 0.25);
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 850; lp.Q.value = 0.6;
+    g.connect(lp); lp.connect(master);
+    ch.intervals.forEach((iv, idx) => {
+      const o = ctx.createOscillator();
+      o.type = idx === 0 ? 'sawtooth' : 'triangle';
+      o.frequency.value = hz(ch.rootMidi + 12 + iv + transpose);
+      o.detune.value = idx === 0 ? -4 : 4;
+      o.connect(g); o.start(t0); o.stop(t1 + 0.3);
+    });
+  }
+  for (const ch of tl.chords) {
+    for (let b = 0; b < 4; b++) {
+      const t = ch.start + b * (ch.dur / 4);
+      const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = hz(ch.rootMidi - 12 + transpose);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.2, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+      o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.55);
+    }
+  }
+  for (const ch of tl.chords) {
+    const beat = ch.dur / 4, eighth = ch.dur / 8;
+    for (const bt of [0, 2]) {
+      const t = ch.start + bt * beat;
+      const o = ctx.createOscillator(); o.type = 'sine';
+      o.frequency.setValueAtTime(140, t);
+      o.frequency.exponentialRampToValueAtTime(46, t + 0.11);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.8, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.17);
+      o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.2);
+    }
+    for (let e = 0; e < 8; e++) {
+      const t = ch.start + e * eighth;
+      const src = ctx.createBufferSource(); src.buffer = noise;
+      const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 7500;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(e % 2 === 1 ? 0.13 : 0.06, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+      src.connect(hp); hp.connect(g); g.connect(master); src.start(t);
+    }
+  }
+  return ctx.startRendering();
+}
+async function renderGuide(tl, { transpose = 0, sampleRate = 44100 } = {}) {
+  const length = Math.ceil((tl.duration + 0.8) * sampleRate);
+  const ctx = new OfflineAudioContext(2, length, sampleRate);
+  const master = ctx.createGain(); master.gain.value = 0.5;
+  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2800;
+  master.connect(lp); lp.connect(ctx.destination);
+  for (const line of tl.lines) {
+    for (const w of line.words) {
+      if (w.midi == null) continue;
+      const dur = Math.max(0.1, w.end - w.start);
+      const o = ctx.createOscillator(); o.type = 'triangle'; o.frequency.value = hz(w.midi + transpose);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, w.start);
+      g.gain.linearRampToValueAtTime(0.9, w.start + 0.02);
+      g.gain.setValueAtTime(0.9, w.start + dur * 0.8);
+      g.gain.linearRampToValueAtTime(0.0001, w.end + 0.08);
+      o.connect(g); g.connect(master); o.start(w.start); o.stop(w.end + 0.12);
+    }
+  }
+  return ctx.startRendering();
+}
+/* ---------- YIN-детектор (de Cheveigné & Kawahara, канон 2.0) ---------- */
+function detectPitchYIN(buf, sampleRate, opts = {}) {
+  const { threshold = 0.12, minFreq = 70, maxFreq = 1100 } = opts;
+  const W = buf.length;
+  const tauMax = Math.min(Math.floor(sampleRate / minFreq), W - 2);
+  const tauMin = Math.max(2, Math.floor(sampleRate / maxFreq));
+  if (tauMax - tauMin < 4) return null;
+  const d = new Float64Array(tauMax + 1);
+  const L = W - tauMax;
+  for (let tau = tauMin; tau <= tauMax; tau++) {
+    let sum = 0;
+    for (let j = 0; j < L; j++) { const diff = buf[j] - buf[j + tau]; sum += diff * diff; }
+    d[tau] = sum;
+  }
+  let run = 0;
+  const cm = new Float64Array(tauMax + 1);
+  for (let tau = tauMin; tau <= tauMax; tau++) {
+    run += d[tau];
+    cm[tau] = run > 0 ? (d[tau] * (tau - tauMin + 1)) / run : 1;
+  }
+  let tau = -1;
+  for (let t = tauMin + 1; t <= tauMax; t++) {
+    if (cm[t] < threshold) {
+      while (t + 1 <= tauMax && cm[t + 1] < cm[t]) t++;
+      tau = t; break;
+    }
+  }
+  if (tau < 0) return null;
+  let better = tau;
+  if (tau > tauMin && tau < tauMax) {
+    const s0 = d[tau - 1], s1 = d[tau], s2 = d[tau + 1];
+    const den = s0 - 2 * s1 + s2;
+    if (Math.abs(den) > 1e-9) better = tau + (0.5 * (s0 - s2)) / den;
+  }
+  const freq = sampleRate / better;
+  if (freq < minFreq || freq > maxFreq) return null;
+  return freq;
+}
+class PitchTracker {
+  constructor({ sampleRate, threshold = 0.12, minFreq = 70, maxFreq = 1100, minRms = 0.006, history = 5 } = {}) {
+    this.sampleRate = sampleRate; this.threshold = threshold;
+    this.minFreq = minFreq; this.maxFreq = maxFreq; this.minRms = minRms;
+    this.hist = []; this.history = history;
+  }
+  feed(buf) {
+    const rms = rmsOf(buf);
+    let freq = null;
+    if (rms > this.minRms) {
+      freq = detectPitchYIN(buf, this.sampleRate, { threshold: this.threshold, minFreq: this.minFreq, maxFreq: this.maxFreq });
+    }
+    this.hist.push({ freq, voiced: freq != null, rms });
+    if (this.hist.length > this.history) this.hist.shift();
+    const vf = this.hist.filter((h) => h.voiced && h.freq).map((h) => h.freq);
+    let midi = null;
+    if (vf.length) { vf.sort((a, b) => a - b); midi = midiFromFreq(vf[Math.floor(vf.length / 2)]); }
+    return { midi, voiced: midi != null, rms, freq };
+  }
+}
+
+/* ---------- аудио-движок: минус, гид, голос, эхо сцены ---------- */
+const AE = {
+  ctx: null, master: null, bGain: null, gGain: null,
+  vGain: null, wet: null, conv: null, dryVoice: null,
+  micStream: null, analyser: null, tracker: null, micBuf: null,
+  bSrc: null, gSrc: null,
+  buffers: null, guideBuf: null, startT: 0, offset: 0, playing: false,
+  shift: 0,
+};
+function ensureCtx() {
+  if (AE.ctx) return AE.ctx;
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  AE.ctx = ctx;
+  AE.master = ctx.createGain(); AE.master.gain.value = 0.9;
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -14; comp.knee.value = 8; comp.ratio.value = 3; comp.attack.value = 0.004; comp.release.value = 0.2;
+  AE.master.connect(comp); comp.connect(ctx.destination);
+  AE.bGain = ctx.createGain(); AE.bGain.gain.value = 0.9; AE.bGain.connect(AE.master);
+  AE.gGain = ctx.createGain(); AE.gGain.gain.value = 0.35; AE.gGain.connect(AE.master);
+  /* голос: фильтр → анализ (до эффектов) → сухой + свёрточный реверб */
+  AE.voiceIn = ctx.createBiquadFilter(); AE.voiceIn.type = 'highpass'; AE.voiceIn.frequency.value = 90;
+  AE.vGain = ctx.createGain(); AE.vGain.gain.value = 1.2;
+  AE.analyser = ctx.createAnalyser(); AE.analyser.fftSize = 2048;
+  AE.voiceIn.connect(AE.analyser);
+  AE.voiceIn.connect(AE.vGain);
+  AE.conv = ctx.createConvolver();
+  const sr = ctx.sampleRate, irLen = Math.ceil(sr * 1.7);
+  const ir = ctx.createBuffer(2, irLen, sr);
+  for (let c = 0; c < 2; c++) {
+    const ch = ir.getChannelData(c);
+    for (let i = 0; i < irLen; i++) ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / irLen, 2.6);
+  }
+  AE.conv.buffer = ir;
+  AE.wet = ctx.createGain(); AE.wet.gain.value = 0.22;
+  AE.vGain.connect(AE.conv); AE.conv.connect(AE.wet); AE.wet.connect(AE.master);
+  AE.vGain.connect(AE.master);
+  AE.micBuf = new Float32Array(AE.analyser.fftSize);
+  return ctx;
+}
+async function enableMic() {
+  const ctx = ensureCtx();
+  if (AE.micStream) return true;
+  try {
+    AE.micStream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: false, noiseSuppression: true, autoGainControl: true },
+    });
+  } catch (e) {
+    return false;
+  }
+  const src = ctx.createMediaStreamSource(AE.micStream);
+  src.connect(AE.voiceIn);
+  AE.tracker = new PitchTracker({ sampleRate: ctx.sampleRate });
+  return true;
+}
+function micDelaySec() {
+  const ctx = AE.ctx;
+  const out = (ctx.outputLatency || ctx.baseLatency || 0);
+  return out + 0.03 + S.manDelayMs / 1000;
+}
+function makeSources(fromOffset) {
+  const ctx = AE.ctx;
+  stopSources();
+  const t0 = ctx.currentTime + 0.12;
+  const rate = Math.pow(2, AE.shift / 12);
+  const useDetune = 'detune' in (window.AudioBufferSourceNode ? AudioBufferSourceNode.prototype : {});
+  const b = ctx.createBufferSource();
+  b.buffer = AE.buffers;
+  if (useDetune) { b.detune.value = AE.shift * 100; } else { b.playbackRate.value = rate; }
+  b.connect(AE.bGain); b.start(t0, fromOffset);
+  AE.bSrc = b;
+  if (AE.guideBuf && AE.gGain.gain.value > 0.001) {
+    const g = ctx.createBufferSource();
+    g.buffer = AE.guideBuf;
+    if (useDetune) { g.detune.value = AE.shift * 100; } else { g.playbackRate.value = rate; }
+    g.connect(AE.gGain); g.start(t0, fromOffset);
+    AE.gSrc = g;
+  }
+  AE.startT = t0 - fromOffset;
+  AE.playing = true;
+}
+function stopSources() {
+  for (const k of ['bSrc', 'gSrc']) {
+    if (AE[k]) { try { AE[k].stop(); } catch (e) {} try { AE[k].disconnect(); } catch (e) {} AE[k] = null; }
+  }
+  AE.playing = false;
+}
+function songTime() { return AE.ctx && AE.playing ? AE.ctx.currentTime - AE.startT : AE.offset; }
+function applyShift(v) {
+  AE.shift = clamp(v, -3, 3);
+  const useDetune = 'detune' in (window.AudioBufferSourceNode ? AudioBufferSourceNode.prototype : {});
+  const val = useDetune ? AE.shift * 100 : null;
+  for (const k of ['bSrc', 'gSrc']) {
+    if (!AE[k]) continue;
+    if (val != null) AE[k].detune.setTargetAtTime(val, AE.ctx.currentTime, 0.05);
+    else AE[k].playbackRate.setTargetAtTime(Math.pow(2, AE.shift / 12), AE.ctx.currentTime, 0.05);
+  }
+  renderChips();
+}
+
+/* ---------- судья: медиана/MAD, октава-толерантность ---------- */
+const MODES = {
+  friendly: { label: 'Дружелюбный', tol: 1.6, minCoverage: 0.22, weights: { accuracy: 0.5, rhythm: 0.25, stability: 0.25 } },
+  jury: { label: 'Жюри', tol: 1.0, minCoverage: 0.35, weights: { accuracy: 0.6, rhythm: 0.2, stability: 0.2 } },
+};
+function centsDev(midiDetected, ref, octave) {
+  let d = (midiDetected - ref) * 100;
+  if (octave) d = ((d % 1200) + 1800) % 1200 - 600;
+  return d;
+}
+function scoreWord(frames, word, opts, shift) {
+  const t0 = word.start, t1 = word.end;
+  const win = frames.filter((f) => f.t >= t0 - 0.06 && f.t <= t1 + 0.12);
+  const voiced = win.filter((f) => f.voiced && f.midi != null);
+  const coverage = win.length ? voiced.length / win.length : 0;
+  let accuracy = null, stability = null, meanAbsCents = null;
+  if (word.midi != null && voiced.length) {
+    const devs = voiced.map((f) => centsDev(f.midi, word.midi + shift, opts.octave));
+    const medianAbs = median(devs.map(Math.abs));
+    accuracy = clamp(1 - medianAbs / (50 * opts.tol), 0, 1);
+    const med = median(devs);
+    const mad = median(devs.map((x) => Math.abs(x - med)));
+    stability = clamp(1 - (mad * 1.4826) / 120, 0, 1);
+    meanAbsCents = medianAbs;
+  }
+  let rhythm = null;
+  const first = voiced[0] || win.find((f) => f.voiced);
+  if (first) {
+    const dt = first.t - t0;
+    rhythm = dt <= 0.15 ? 1 : clamp(1 - (dt - 0.15) / 0.5, 0, 1);
+  }
+  return { coverage, accuracy, rhythm, stability, voiced: coverage >= opts.minCoverage, meanAbsCents };
+}
+function wordTotal(sc, opts) {
+  const w = opts.weights;
+  let total = 0, wsum = 0;
+  for (const k of ['accuracy', 'rhythm', 'stability']) {
+    if (sc[k] != null) { total += w[k] * sc[k]; wsum += w[k]; }
+  }
+  return wsum > 0 ? Math.round((100 * total) / wsum) : null;
+}
+function lineAggregate(line) {
+  const ws = line.words;
+  const parts = ws.map((w) => ({ text: w.text, sc: w.score }));
+  const dur = (i) => Math.max(0.15, ws[i].end - ws[i].start);
+  const avg = (key) => {
+    let s = 0, n = 0;
+    parts.forEach((p, i) => { if (p.sc && p.sc[key] != null) { s += p.sc[key] * dur(i); n += dur(i); } });
+    return n > 0 ? s / n : null;
+  };
+  const acc = { accuracy: avg('accuracy'), rhythm: avg('rhythm'), stability: avg('stability') };
+  const opts = MODES[S.mode];
+  const w = opts.weights;
+  let total = 0, wsum = 0;
+  for (const k of ['accuracy', 'rhythm', 'stability']) {
+    if (acc[k] != null) { total += w[k] * acc[k]; wsum += w[k]; }
+  }
+  let pct = wsum > 0 ? Math.round((100 * total) / wsum) : 0;
+  if (!parts.some((p) => p.sc && p.sc.voiced)) pct = 0;
+  return { total: pct, accuracy: acc.accuracy, rhythm: acc.rhythm, stability: acc.stability, words: parts, hasRef: ws.some((x) => x.midi != null), text: line.text };
+}
+
+/* ---------- Зелёный коридор: сцена подстраивается под певца ---------- */
+function corridorFeedback(lineScore) {
+  if (!S.corridorOn) return;
+  S.hold = Math.max(0, (S.hold || 0) - 1);
+  if (S.hold > 0) return;
+  if (lineScore < 55 && AE.shift > -3) {
+    applyShift(AE.shift - 1); S.hold = 2;
+    toast('Коридор: тональность ' + (AE.shift > 0 ? '+' + AE.shift : AE.shift) + ' пт — сцена спустилась к тебе');
+  } else if (lineScore >= 80 && AE.shift < 0) {
+    applyShift(AE.shift + 1); S.hold = 2;
+    toast('Коридор: возврат к ' + (AE.shift === 0 ? 'оригиналу' : AE.shift + ' пт'));
+  }
+}
+/* ---------- состояние ---------- */
+const S = {
+  screen: 'home', mode: 'friendly', octave: true, corridorOn: true,
+  manDelayMs: 0, name: '',
+  song: null, tl: null, frames: [], freeMode: false, spectator: false,
+  raf: 0, tick: 0, paused: false, ended: false, hold: 0,
+  lineIdx: -1, lineResults: [], scoredCount: 0,
+};
+const LS_REC = 'ik.records.v1', LS_Q = 'ik.queue.v1';
+const loadLS = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
+const saveLS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const getQueue = () => loadLS(LS_Q, []);
+const addRecord = (songId, rec) => {
+  const all = loadLS(LS_REC, {});
+  const arr = all[songId] || [];
+  arr.push(rec); arr.sort((a, b) => b.s - a.s);
+  all[songId] = arr.slice(0, 5);
+  saveLS(LS_REC, all);
+};
+
+/* ---------- чипы статуса ---------- */
+function renderChips() {
+  const box = $('#chips'); if (!box) return;
+  const lat = Math.round(((AE.ctx ? (AE.ctx.outputLatency || AE.ctx.baseLatency || 0) : 0) + 0.03) * 1000 + S.manDelayMs);
+  box.innerHTML = [
+    AE.micStream ? '<span class="chip ok">микрофон: живой</span>' : '<span class="chip">микрофон: не включён</span>',
+    '<span class="chip lat">задержка: ~' + lat + ' мс</span>',
+    '<span class="chip' + (AE.shift !== 0 ? ' warn' : '') + '">коридор: ' + (AE.shift > 0 ? '+' : '') + AE.shift + ' пт</span>',
+    '<span class="chip mode">' + MODES[S.mode].label + (S.octave ? ' · октава+' : '') + '</span>',
+  ].join('');
+}
+
+/* ---------- главный экран ---------- */
+function renderHome() {
+  S.screen = 'home';
+  stopLoop(); stopSources();
+  const recs = loadLS(LS_REC, {});
+  const principle = (n, t, d) => '<div class="card ideal"><span class="num">' + n + '</span><h3>' + t + '</h3><p>' + d + '</p></div>';
+  const songCards = SONGS.map((s) => {
+    const r = (recs[s.id] || []).slice(0, 3);
+    return '<div class="card"><h3>' + esc(s.meta.ti) + '</h3><p>' + esc(s.meta.ar) + ' · ' + s.bpm + ' BPM · минус синтезируется в браузере</p>' +
+      '<div class="recs grow">' + (r.length ? r.map((x) => '<span><b>' + x.s + '%</b> · ' + esc(x.n || 'Гость') + ' · ' + esc(x.d) + '</span>').join('') : '<span>рекордов ещё нет — первый голос создаёт ноосферу</span>') + '</div>' +
+      '<div class="row"><button class="btn" data-sing="' + s.id + '">На сцену</button><button class="btn ghost" data-q="' + s.id + '">В зал</button></div></div>';
+  }).join('');
+  $('#app').innerHTML =
+    '<section class="hero">' +
+      '<h1 class="hero">ИДЕАЛЬНОЕ <span class="grad">КАРАОКЕ</span></h1>' +
+      '<p class="lead">Прототип-осколок вселенной СИНГУЛЯР. Идеал здесь — не «пой как машина хочет», а <b>среда, которая создаёт пространство, где слышен Человек</b>: судья <b>слушает</b> (YIN, медиана/MAD, октава-толерантность), «Зелёный коридор» <b>обнаруживает</b> твою тональность и спускает сцену к тебе, зал <b>создаёт</b> ноосферу из голосов. Роль Человека в ноосфере — та же: понимать · обнаруживать · создавать. Голос не покидает устройство.</p>' +
+      '<div class="row">' +
+        '<label class="btn ghost">Режим <select id="mode-sel"><option value="friendly">Дружелюбный</option><option value="jury">Жюри</option></select></label>' +
+        '<label class="btn ghost"><input type="checkbox" id="oct-cb" checked> октава-толерантность</label>' +
+        '<label class="btn ghost"><input type="checkbox" id="cor-cb" checked> Зелёный коридор</label>' +
+        '<input type="text" id="name-in" placeholder="Имя в зале" maxlength="24" style="max-width:180px">' +
+      '</div>' +
+    '</section>' +
+    '<div class="sub">шесть принципов идеальности</div>' +
+    '<div class="grid">' +
+      principle('01', 'Синхрон', 'по-слоговая подсветка слов и компенсация задержки микрофона: авто-оценка + ручная подстройка — кривая голоса ложится на плашку нот') +
+      principle('02', 'Честный судья', 'YIN-детектор, медиана и MAD вместо среднего: одна неровная граница слова не рушит оценку; точность · ритм · стабильность') +
+      principle('03', 'Коридор', 'просадка по строке — сцена спускает тональность (до -3 пт, detune без смены темпа); выравнялся — вернулась к оригиналу') +
+      principle('04', 'Поддержка голоса', 'гид-мелодия с живой громкостью, «Эхо сцены» на голос, раздельные слои минуса и голоса') +
+      principle('05', 'Память зала', 'очередь певцов и ноосфера-рекорды в localStorage: каждый голос остаётся в истории зала') +
+      principle('06', 'Свобода', 'один файл, ноль зависимостей, полностью офлайн; свой трек + LRC; минус-вокал вычитанием центрального канала') +
+    '</div>' +
+    '<div class="sub">песни</div>' +
+    '<div class="grid">' + songCards +
+      '<div class="card"><h3>Свой трек</h3><p>mp3/wav/ogg + Enhanced LRC ([00:12.34]строка, слова &lt;00:12.90&gt;слово). Без эталонной мелодии судья честно оценит ритм и стабильность, без точности.</p>' +
+        '<input type="file" id="file-in" accept="audio/*">' +
+        '<textarea id="lrc-in" placeholder="[00:05.00]Первая строка&#10;[00:09.00]<00:05.00>Вто <00:06.00>рая — по-словно"></textarea>' +
+        '<label class="row" style="font-size:.8rem;color:var(--dim)"><input type="checkbox" id="cut-cb"> убрать вокал (центр-канал)</label>' +
+        '<div class="row grow"><button class="btn mag" id="custom-go">Свой трек: на сцену</button></div></div>' +
+    '</div>' +
+    '<div class="sub">зал</div>' +
+    '<div class="grid"><div class="card"><h3>Очередь зала</h3><div class="recs grow" id="queue-box"></div></div>' +
+      '<div class="card"><h3>Ноосфера зала</h3><p>Лучшие голоса по каждой песне (localStorage, офлайн).</p><div class="recs grow" id="recs-box"></div><div class="row"><button class="btn ghost" id="recs-clear">Очистить рекорды</button></div></div></div>' +
+    '<div class="sub">синхронизация · задержка микрофона</div>' +
+    '<div class="card"><p>Авто-оценка берётся из AudioContext (outputLatency). Наушники убирают петлю обратной связи и делают кривую честной. Подстрой вручную, если кривая стабильно отстаёт или спешит.</p>' +
+      '<label style="font-size:.7rem;color:var(--dim)">ручная подстройка: <span id="man-lab">' + S.manDelayMs + ' мс</span><input type="range" id="man-del" min="-300" max="300" step="10" value="' + S.manDelayMs + '"></label>' +
+    '</div>';
+  $('#mode-sel').value = S.mode;
+  $('#mode-sel').addEventListener('change', (e) => { S.mode = e.target.value; renderChips(); });
+  $('#oct-cb').addEventListener('change', (e) => { S.octave = e.target.checked; renderChips(); });
+  $('#cor-cb').addEventListener('change', (e) => { S.corridorOn = e.target.checked; });
+  $('#name-in').value = S.name;
+  $('#name-in').addEventListener('input', (e) => { S.name = e.target.value.trim(); });
+  document.querySelectorAll('[data-sing]').forEach((b) => b.addEventListener('click', () => launchBuiltIn(b.dataset.sing)));
+  document.querySelectorAll('[data-q]').forEach((b) => b.addEventListener('click', () => {
+    const q = getQueue(); q.push(b.dataset.q); saveLS(LS_Q, q); drawQueue(); toast('Песня встала в очередь зала');
+  }));
+  $('#custom-go').addEventListener('click', launchCustom);
+  $('#man-del').addEventListener('input', (e) => { S.manDelayMs = +e.target.value; $('#man-lab').textContent = S.manDelayMs + ' мс'; renderChips(); });
+  $('#recs-clear').addEventListener('click', () => { localStorage.removeItem(LS_REC); renderHome(); });
+  drawQueue(); drawRecords(); renderChips();
+}
+function drawQueue() {
+  const box = $('#queue-box'); if (!box) return;
+  const q = getQueue();
+  box.innerHTML = q.length
+    ? q.map((id, i) => { const s = SONGS.find((x) => x.id === id); return '<span>' + (i + 1) + '. ' + esc(s ? s.meta.ti : id) + ' <button class="btn ghost" data-unq="' + i + '" style="padding:2px 8px;font-size:.7rem">убрать</button></span>'; }).join('')
+    : '<span>зал пуст — поставь песню кнопкой «В зал»</span>';
+  box.querySelectorAll('[data-unq]').forEach((b) => b.addEventListener('click', () => {
+    const q2 = getQueue(); q2.splice(+b.dataset.unq, 1); saveLS(LS_Q, q2); drawQueue();
+  }));
+}
+function drawRecords() {
+  const box = $('#recs-box'); if (!box) return;
+  const recs = loadLS(LS_REC, {});
+  const rows = SONGS.map((s) => {
+    const r = recs[s.id] || [];
+    return '<span style="color:var(--ink)">' + esc(s.meta.ti) + '</span>' + (r.length
+      ? r.map((x) => '<span><b>' + x.s + '%</b> · ' + esc(x.n || 'Гость') + ' · ' + esc(x.d) + '</span>').join('')
+      : '<span>— тишина ждёт первого голоса</span>');
+  });
+  box.innerHTML = rows.join('');
+}
+
+/* ---------- запуск песни ---------- */
+async function launchBuiltIn(id) {
+  const song = SONGS.find((x) => x.id === id);
+  const tl = buildTimeline(song);
+  startStage(song, tl, null, null, true);
+}
+async function launchCustom() {
+  const fi = $('#file-in');
+  if (!fi.files || !fi.files[0]) { toast('Сначала выбери аудиофайл', true); return; }
+  const lrcText = $('#lrc-in').value || '';
+  const cut = $('#cut-cb').checked;
+  toast('Декодирую трек...');
+  const ctx = ensureCtx();
+  let buf;
+  try {
+    buf = await ctx.decodeAudioData(await fi.files[0].arrayBuffer());
+  } catch (e) { toast('Файл не декодировался: ' + e.message, true); return; }
+  if (cut) buf = centerCut(buf);
+  const song = { id: 'custom', meta: { ti: fi.files[0].name.replace(/\.[^.]+$/, ''), ar: 'Свой трек' } };
+  const parsed = parseLRC(lrcText);
+  const tl = parsed.length ? lrcToTimeline(parsed, buf.duration) : { duration: buf.duration, lines: [], hasRef: false, chords: [] };
+  startStage(song, tl, buf, null, false, parsed.length === 0);
+}
+function centerCut(buf) {
+  const ctx = AE.ctx;
+  const L = buf.getChannelData(0);
+  const R = buf.numberOfChannels > 1 ? buf.getChannelData(1) : L;
+  const out = ctx.createBuffer(buf.numberOfChannels, buf.length, buf.sampleRate);
+  for (let c = 0; c < buf.numberOfChannels; c++) {
+    const oc = out.getChannelData(c);
+    for (let i = 0; i < buf.length; i++) oc[i] = (L[i] - R[i]) * 0.9;
+  }
+  toast('Вокал в центре стерео вычтен (прототип метода)');
+  return out;
+}
+function startStage(song, tl, backingBuf, guideBuf, needRender, free) {
+  S.song = song; S.tl = tl; S.frames = []; S.lineIdx = -1; S.lineResults = [];
+  S.scoredCount = 0; S.paused = false; S.ended = false; S.hold = 0; S.freeMode = !!free;
+  AE.buffers = backingBuf; AE.guideBuf = guideBuf; AE.shift = 0; AE.offset = 0;
+  S.screen = 'stage'; S.needRender = !!needRender;
+  $('#app').innerHTML =
+    '<div class="stage">' +
+      '<div class="stage-top">' +
+        '<div class="row"><button class="btn ghost" id="btn-exit">Выход</button><span class="title">' + esc(song.meta.ti) + ' · ' + esc(song.meta.ar) + '</span></div>' +
+        '<div class="hud">' +
+          '<span class="chip" id="hud-score">0%</span>' +
+          '<span class="chip" id="hud-note">—</span>' +
+          '<span class="chip warn" id="hud-shift">коридор ±0</span>' +
+          '<span class="chip" id="hud-state">готов</span>' +
+        '</div>' +
+      '</div>' +
+      '<canvas id="roll"></canvas>' +
+      '<div class="lyr prev" id="lyr-prev"></div><div class="lyr cur" id="lyr-cur"></div><div class="lyr next" id="lyr-next"></div>' +
+      '<div class="ctl">' +
+        '<button class="btn" id="btn-pause" disabled>Пауза</button>' +
+        '<label>минус<input type="range" id="sl-b" min="0" max="100" value="90"></label>' +
+        '<label>гид<input type="range" id="sl-g" min="0" max="100" value="35"></label>' +
+        '<label>голос<input type="range" id="sl-v" min="0" max="200" value="120"></label>' +
+        '<label>эхо сцены<input type="range" id="sl-r" min="0" max="100" value="22"></label>' +
+        '<label>задержка, мс<input type="range" id="sl-d" min="-300" max="300" step="10" value="' + S.manDelayMs + '"><span id="lab-d" style="color:var(--ink)">' + S.manDelayMs + '</span></label>' +
+      '</div>' +
+    '</div>' +
+    '<div class="overlay" id="gate">' +
+      '<h2>' + esc(song.meta.ti) + '</h2>' +
+      '<p>' + (needRender ? 'Синтезирую минус и гид-мелодию прямо в браузере (несколько секунд).' : 'Трек декодирован и готов.') +
+      ' Дальше: включи микрофон, надень наушники и пой. Если просадишь строку — коридор сам спустит тональность.</p>' +
+      '<button class="btn big mag" id="btn-start"' + (needRender ? ' disabled' : '') + '>Включить микрофон и начать</button>' +
+      '<button class="btn ghost" id="btn-start-quiet"' + (needRender ? ' disabled' : '') + '>Слушать без микрофона</button>' +
+    '</div>';
+  $('#btn-exit').addEventListener('click', exitToHome);
+  $('#btn-pause').addEventListener('click', togglePause);
+  $('#sl-b').addEventListener('input', (e) => { AE.bGain.gain.setTargetAtTime(e.target.value / 100, AE.ctx.currentTime, 0.03); });
+  $('#sl-g').addEventListener('input', (e) => { AE.gGain.gain.setTargetAtTime(e.target.value / 100, AE.ctx.currentTime, 0.03); });
+  $('#sl-v').addEventListener('input', (e) => { AE.vGain.gain.setTargetAtTime(e.target.value / 100, AE.ctx.currentTime, 0.03); });
+  $('#sl-r').addEventListener('input', (e) => { AE.wet.gain.setTargetAtTime(e.target.value / 100, AE.ctx.currentTime, 0.03); });
+  $('#sl-d').addEventListener('input', (e) => { S.manDelayMs = +e.target.value; $('#lab-d').textContent = S.manDelayMs; renderChips(); });
+  $('#btn-start').addEventListener('click', () => beginStage(true));
+  $('#btn-start-quiet').addEventListener('click', () => beginStage(false));
+  if (needRender) {
+    (async () => {
+      const [b, g] = await Promise.all([renderBacking(tl, {}), renderGuide(tl, {})]);
+      AE.buffers = b; AE.guideBuf = g;
+      const gs = $('#btn-start'); if (gs) gs.disabled = false;
+      const gq = $('#btn-start-quiet'); if (gq) gq.disabled = false;
+      const st = $('#hud-state'); if (st) st.textContent = 'минус готов';
+      toast('Минус и гид синтезированы');
+    })();
+  }
+}
+async function beginStage(withMic) {
+  const ctx = ensureCtx();
+  await ctx.resume();
+  S.spectator = true;
+  if (withMic) {
+    const ok = await enableMic();
+    if (!ok) { toast('Микрофон не доступен — режим зрителя: сцена живёт, оценка не ведётся', true); }
+    else { S.spectator = false; }
+  } else {
+    toast('Режим зрителя: без микрофона');
+  }
+  const gate = $('#gate'); if (gate) gate.remove();
+  $('#btn-pause').disabled = false;
+  $('#hud-state').textContent = 'поём';
+  makeSources(0);
+  startLoop();
+}
+function togglePause() {
+  if (!AE.ctx) return;
+  if (S.paused) {
+    makeSources(AE.offset);
+    $('#btn-pause').textContent = 'Пауза';
+    $('#hud-state').textContent = 'поём';
+  } else {
+    AE.offset = Math.max(0, songTime());
+    stopSources();
+    $('#btn-pause').textContent = 'Продолжить';
+    $('#hud-state').textContent = 'пауза';
+  }
+  S.paused = !S.paused;
+}
+function exitToHome() {
+  stopLoop(); stopSources();
+  if (AE.micStream) { AE.micStream.getTracks().forEach((t) => t.stop()); AE.micStream = null; }
+  renderHome();
+}
+
+/* ---------- живой цикл сцены ---------- */
+function startLoop() {
+  stopLoop();
+  const tickFn = () => {
+    if (S.screen !== 'stage' || S.paused || S.ended) return;
+    const t = songTime();
+    /* сбор кадров голоса */
+    if (!S.spectator && AE.analyser && AE.tracker) {
+      AE.analyser.getFloatTimeDomainData(AE.micBuf);
+      const r = AE.tracker.feed(AE.micBuf);
+      if (t >= 0) S.frames.push({ t: t - micDelaySec(), midi: r.midi, voiced: r.voiced, rms: r.rms });
+      if (S.frames.length > 6000) S.frames.splice(0, 1000);
+    }
+    /* судья: дорисовывает слова, чьё окно закрылось */
+    if (!S.spectator && !S.freeMode) scoreDueWords(t);
+    updateLyrics(t);
+    drawRoll(t);
+    updateHud(t);
+    /* конец песни */
+    if (t >= S.tl.duration + 0.4) finishSong();
+  };
+  S.tick = setInterval(tickFn, 70);
+  const rafFn = () => {
+    if (S.screen !== 'stage') return;
+    if (!S.paused && !S.ended) {
+      const t = songTime();
+      updateLyrics(t); drawRoll(t);
+    }
+    S.raf = requestAnimationFrame(rafFn);
+  };
+  S.raf = requestAnimationFrame(rafFn);
+}
+function stopLoop() {
+  if (S.tick) { clearInterval(S.tick); S.tick = 0; }
+  if (S.raf) { cancelAnimationFrame(S.raf); S.raf = 0; }
+}
+function scoreDueWords(t) {
+  const opts = { ...MODES[S.mode], octave: S.octave };
+  const lines = S.tl.lines;
+  for (let li = 0; li < lines.length; li++) {
+    const line = lines[li];
+    if (S.lineResults.some((r) => r.at === li)) continue;
+    let allDone = true;
+    for (const w of line.words) {
+      if (w.score) continue;
+      if (t >= w.end + 0.12) {
+        w.score = scoreWord(S.frames, w, opts, AE.shift);
+        if (w.midi == null) w.verdict = w.score.voiced ? 'good' : 'miss';
+        else if (w.score.meanAbsCents != null && w.score.meanAbsCents <= 50) w.verdict = 'good';
+        else if (w.score.voiced) w.verdict = 'bad';
+        else w.verdict = 'miss';
+      }
+      if (!w.score) allDone = false;
+    }
+    if (allDone && t >= line.end - 0.2) {
+      const agg = lineAggregate(line);
+      agg.at = li;
+      S.lineResults.push(agg);
+      corridorFeedback(agg.total);
+    }
+  }
+}
+function currentLineIdx(t) {
+  const lines = S.tl.lines;
+  for (let i = 0; i < lines.length; i++) {
+    if (t >= lines[i].start - 0.35 && t < lines[i].end + 0.7) return i;
+  }
+  for (let i = 0; i < lines.length; i++) { if (lines[i].start > t) return i; }
+  return lines.length - 1;
+}
+function updateLyrics(t) {
+  if (S.freeMode || !S.tl.lines.length) { $('#lyr-cur').textContent = 'свободное пение — без лирики'; return; }
+  const idx = currentLineIdx(t);
+  const lines = S.tl.lines;
+  const fmt = (l) => l ? esc(l.text) : '';
+  $('#lyr-prev').innerHTML = lines[idx - 1] ? fmt(lines[idx - 1]) : '';
+  $('#lyr-next').innerHTML = lines[idx + 1] ? fmt(lines[idx + 1]) : '';
+  const cur = lines[idx];
+  if (!cur) { $('#lyr-cur').textContent = ''; return; }
+  let html = '';
+  for (const w of cur.words) {
+    let cls = 'w todo';
+    if (w.score) cls += w.verdict === 'good' ? ' good' : (w.verdict === 'bad' ? ' bad' : '');
+    else if (t >= w.end) cls += ' done';
+    else if (t >= w.start) {
+      const fill = clamp((t - w.start) / Math.max(0.05, w.end - w.start), 0, 1);
+      cls += fill > 0.45 ? ' fill' : ' done';
+    } else if (t >= w.start - 0.25) cls += ' fill';
+    html += '<span class="' + cls + '">' + esc(w.text) + '</span>';
+  }
+  $('#lyr-cur').innerHTML = html;
+}
+function updateHud(t) {
+  const scored = [];
+  for (const l of S.tl.lines) for (const w of l.words) if (w.score && w.score.voiced) scored.push(w);
+  let pct = 0;
+  if (scored.length) {
+    const opts = MODES[S.mode];
+    let sum = 0, wsum = 0;
+    for (const w of scored) {
+      const tt = wordTotal(w.score, opts);
+      if (tt != null) { const d = Math.max(0.15, w.end - w.start); sum += tt * d; wsum += d; }
+    }
+    pct = wsum > 0 ? Math.round(sum / wsum) : 0;
+  }
+  const hs = $('#hud-score');
+  if (hs) { hs.textContent = pct + '%'; hs.className = 'chip ' + (pct >= 80 ? 'ok' : pct >= 55 ? 'warn' : ''); }
+  const last = S.frames.length ? S.frames[S.frames.length - 1] : null;
+  const hn = $('#hud-note');
+  if (hn) hn.textContent = last && last.midi != null ? noteName(last.midi) : '—';
+  const hsh = $('#hud-shift');
+  if (hsh) hsh.textContent = 'коридор ' + (AE.shift > 0 ? '+' : '') + AE.shift + ' пт';
+}
+
+/* ---------- piano-roll: цели, кривая голоса, сетка тактов ---------- */
+function drawRoll(t) {
+  const cv = $('#roll'); if (!cv) return;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const W = cv.clientWidth, H = cv.clientHeight;
+  if (!W || !H) return;
+  if (cv.width !== W * dpr || cv.height !== H * dpr) { cv.width = W * dpr; cv.height = H * dpr; }
+  const g = cv.getContext('2d');
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, W, H);
+  const view = 6.5, t0 = t - 1.6;
+  const mapT = (x) => ((x - t0) / view) * W;
+  let lo = 55, hi = 74;
+  if (S.tl.lines.length) {
+    const ms = [];
+    for (const l of S.tl.lines) for (const w of l.words) if (w.midi != null) ms.push(w.midi);
+    if (ms.length) { lo = Math.min(...ms) - 3; hi = Math.max(...ms) + 3; }
+  }
+  const mapM = (m) => H - ((m - lo) / Math.max(1, hi - lo)) * (H - 16) - 8;
+  /* сетка: такты и названия нот */
+  g.font = '10px system-ui'; g.textBaseline = 'middle';
+  if (S.tl.chords) {
+    for (const ch of S.tl.chords) {
+      const x = mapT(ch.start);
+      if (x < -40 || x > W) continue;
+      g.strokeStyle = 'rgba(255,255,255,.05)';
+      g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke();
+    }
+  }
+  for (let m = Math.ceil(lo); m <= hi; m++) {
+    if (m % 12 !== 0) continue;
+    const y = mapM(m);
+    g.fillStyle = 'rgba(139,147,184,.5)';
+    g.fillText(noteName(m), 4, y);
+    g.strokeStyle = 'rgba(139,147,184,.12)';
+    g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke();
+  }
+  /* целевые ноты-плашки */
+  const curIdx = S.freeMode ? -1 : currentLineIdx(t);
+  for (let li = 0; li < S.tl.lines.length; li++) {
+    const line = S.tl.lines[li];
+    if (line.end < t0 - 0.5 || line.start > t0 + view) continue;
+    for (const w of line.words) {
+      if (w.midi == null) continue;
+      const x = mapT(w.start), x2 = mapT(w.end);
+      if (x2 < 0 || x > W) continue;
+      const y = mapM(w.midi + AE.shift);
+      const bw = Math.max(4, x2 - x);
+      const isCur = li === curIdx;
+      let col = 'rgba(34,211,238,' + (isCur ? '0.55' : '0.28') + ')';
+      if (w.score) col = w.verdict === 'good' ? 'rgba(52,211,153,.75)' : w.verdict === 'bad' ? 'rgba(255,43,214,.6)' : 'rgba(139,147,184,.3)';
+      g.fillStyle = col;
+      const bh = 11;
+      if (g.roundRect) { g.beginPath(); g.roundRect(x, y - bh / 2, bw, bh, 5); g.fill(); }
+      else g.fillRect(x, y - bh / 2, bw, bh);
+      if (isCur && bw > 46) {
+        g.fillStyle = 'rgba(238,242,255,.9)';
+        g.fillText(w.text, x + 4, y - 12);
+      }
+    }
+  }
+  /* кривая голоса */
+  const fr = S.frames;
+  const tFrom = t0 - 0.2;
+  g.lineWidth = 2.4; g.lineCap = 'round'; g.lineJoin = 'round';
+  let prev = null;
+  for (let i = 0; i < fr.length; i++) {
+    const f = fr[i];
+    if (f.t < tFrom) continue;
+    if (f.midi == null) { prev = null; continue; }
+    const x = mapT(f.t), y = mapM(clamp(f.midi, lo, hi));
+    if (x > W) break;
+    let col = 'rgba(139,147,184,.45)';
+    if (!S.freeMode && !S.spectator) {
+      const cw = wordAt(f.t);
+      if (cw && cw.midi != null) {
+        const d = Math.abs(centsDev(f.midi, cw.midi + AE.shift, S.octave));
+        col = d <= 60 ? 'rgba(52,211,153,.95)' : 'rgba(255,43,214,.9)';
+      }
+    } else col = 'rgba(34,211,238,.9)';
+    if (prev) {
+      g.strokeStyle = col;
+      g.beginPath(); g.moveTo(prev.x, prev.y); g.lineTo(x, y); g.stroke();
+    }
+    prev = { x, y };
+  }
+  /* мигающий голосовой пульс */
+  const lastF = fr.length ? fr[fr.length - 1] : null;
+  if (lastF && lastF.rms > 0.006) {
+    g.fillStyle = 'rgba(255,43,214,' + clamp(lastF.rms * 6, 0.15, 0.9) + ')';
+    g.beginPath(); g.arc(W - 14, 14, 5, 0, 7); g.fill();
+  }
+  /* курсор времени */
+  const px = mapT(t);
+  g.strokeStyle = 'rgba(255,255,255,.65)';
+  g.beginPath(); g.moveTo(px, 0); g.lineTo(px, H); g.stroke();
+}
+const _wordAt = (t) => {
+  const idx = currentLineIdx(t);
+  const line = S.tl.lines[idx];
+  if (!line) return null;
+  for (const w of line.words) { if (t >= w.start - 0.05 && t <= w.end + 0.1) return w; }
+  return null;
+};
+function wordAt(t) { return (S.freeMode || !S.tl.lines.length) ? null : _wordAt(t); }
+
+/* ---------- финал и результаты ---------- */
+function verdictFor(p) {
+  if (p >= 95) return 'Вечность слышит тебя';
+  if (p >= 85) return 'Ноосфера аплодирует';
+  if (p >= 70) return 'Голос живой — зал помнит';
+  if (p >= 50) return 'Зерно прорастает';
+  if (p > 0) return 'Коридор стал шире — так и растут голоса';
+  return 'Тишина тоже голос: попробуй ещё раз';
+}
+function finishSong() {
+  if (S.ended) return;
+  S.ended = true;
+  stopLoop();
+  AE.offset = 0;
+  stopSources();
+  const app = $('#app');
+  if (S.spectator || S.freeMode) {
+    app.innerHTML = '<div class="res"><h1 class="hero">СЦЕНА <span class="grad">ОСВЕТИЛАСЬ</span></h1>' +
+      '<p class="verdict">' + (S.spectator ? 'Режим зрителя: сцена жила, оценка не велась. Микрофон — когда захочешь.' : 'Свободное пение: без лирики и эталона судья не судит — он слушает.') + '</p>' +
+      '<div class="row" style="justify-content:center"><button class="btn" id="r-home">Домой</button></div></div>';
+    $('#r-home').addEventListener('click', exitToHome);
+    return;
+  }
+  const opts = MODES[S.mode];
+  const L = S.lineResults;
+  const avg = (k) => {
+    let s = 0, n = 0;
+    for (const r of L) if (r[k] != null) { s += r[k]; n++; }
+    return n ? s / n : null;
+  };
+  const total = L.length ? Math.round(L.reduce((a, r) => a + r.total, 0) / L.length) : 0;
+  const acc = avg('accuracy'), rhy = avg('rhythm'), stb = avg('stability');
+  const bar = (label, v) => '<div class="bar-row"><span>' + label + '</span><div class="bar"><i style="width:' + (v == null ? 0 : Math.round(v * 100)) + '%"></i></div><span>' + (v == null ? '—' : Math.round(v * 100)) + '</span></div>';
+  const name = S.name || 'Гость';
+  addRecord(S.song.id, { s: total, d: new Date().toISOString().slice(0, 16).replace('T', ' '), m: opts.label, n: name });
+  const hasNext = getQueue().length > 0;
+  app.innerHTML = '<div class="res">' +
+    '<h1 class="hero">' + esc(S.song.meta.ti) + '</h1>' +
+    '<div class="score-big grad">' + total + '%</div>' +
+    '<p class="verdict">' + verdictFor(total) + ' · ' + esc(name) + ' · режим ' + opts.label + (S.octave ? ' · октава+' : '') + (AE.shift !== 0 ? ' · коридор ' + (AE.shift > 0 ? '+' : '') + AE.shift + ' пт' : '') + '</p>' +
+    '<div class="bars">' + bar('точность', acc) + bar('ритм', rhy) + bar('стабильность', stb) + '</div>' +
+    '<div class="lines-res">' + (L.length ? L.map((r) => '<div><b>' + esc(r.text) + '</b><span>' + r.total + '%</span></div>').join('') : '<div>— строки не прозвучали —</div>') + '</div>' +
+    '<div class="row" style="justify-content:center;margin-top:16px">' +
+      '<button class="btn" id="r-again">Ещё раз</button>' +
+      (hasNext ? '<button class="btn mag" id="r-next">Следующая из зала</button>' : '') +
+      '<button class="btn ghost" id="r-home">Домой</button>' +
+    '</div></div>';
+  $('#r-again').addEventListener('click', () => launchBuiltInOrCustom());
+  if (hasNext) $('#r-next').addEventListener('click', () => {
+    const q = getQueue();
+    const id = q.shift(); saveLS(LS_Q, q);
+    const s = SONGS.find((x) => x.id === id);
+    if (s) { exitToHomeSilent(); launchBuiltIn(id); toast('Из зала: ' + s.meta.ti); }
+    else exitToHome();
+  });
+  $('#r-home').addEventListener('click', exitToHome);
+}
+function launchBuiltInOrCustom() {
+  if (S.song.id === 'custom') { exitToHome(); toast('Свой трек: выбери файл снова на главной'); return; }
+  exitToHomeSilent();
+  launchBuiltIn(S.song.id);
+}
+function exitToHomeSilent() {
+  stopLoop();
+  if (AE.micStream) { AE.micStream.getTracks().forEach((t) => t.stop()); AE.micStream = null; }
+}
+
+/* ---------- запуск ---------- */
+$('#logo-link').addEventListener('click', (e) => { e.preventDefault(); exitToHome(); });
+renderHome();
+renderChips();
+</script>
+</body>
+</html>
