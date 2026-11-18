@@ -1,12 +1,12 @@
 <div align="center">
-  <img src="banner.png" alt="karaoke-dream — Браузерное караоке мечты: неон, гид-вокал, оценка голоса" width="100%">
+  <img src="https://cdn.jsdelivr.net/gh/rtynbirf/karaoke-dream@main/banner.png" alt="karaoke-dream — Браузерное караоке мечты: неон, гид-вокал, оценка голоса" width="100%">
 </div>
 
 <!--ФОРЖ:МУЗА:НАЧАЛО-->
 <div align="center">
-  <img src="repo-muse.svg" width="100%" alt="Муза karaoke-dream: мастерская СЦЕНА СОФИТОВ, кузня ПОЛИМАТ, раунд 12 · REVE=РЕВО" />
+  <img src="https://cdn.jsdelivr.net/gh/rtynbirf/karaoke-dream@main/repo-muse.svg" width="100%" alt="Муза karaoke-dream: мастерская СЦЕНА СОФИТОВ, кузня ПОЛИМАТ, раунд 12 · REVE=РЕВО" />
   <br/>
-  <img src="forge-divider.svg" width="62%" alt="делитель мастерской СЦЕНА СОФИТОВ" />
+  <img src="https://cdn.jsdelivr.net/gh/rtynbirf/karaoke-dream@main/forge-divider.svg" width="62%" alt="делитель мастерской СЦЕНА СОФИТОВ" />
 </div>
 <!--ФОРЖ:МУЗА:КОНЕЦ-->
 
@@ -24,11 +24,11 @@
 
 <div align="center">
 
-<img src="public/logo.svg" alt="KARAOKE DREAM 2.0 — Неоновый вектор" width="100%">
+<img src="https://cdn.jsdelivr.net/gh/rtynbirf/karaoke-dream@main/public/logo.svg" alt="KARAOKE DREAM 2.0 — Неоновый вектор" width="100%">
 
 # KARAOKE DREAM 2.0
 
-<p align="center"><img src=".github/social-preview.png" alt="karaoke-dream" width="100%"></p>
+<p align="center"><img src="https://cdn.jsdelivr.net/gh/rtynbirf/karaoke-dream@main/.github/social-preview.png" alt="karaoke-dream" width="100%"></p>
 
 
 **Браузерное караоке мечты: неон, гид-вокал, оценка голоса в реальном времени и «Зелёный коридор» — среда подстраивается под певца, а не певец под среду.**
