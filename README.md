@@ -1,4 +1,10 @@
 <div align="center">
+
+<a href="https://github.com/rtynbirf/karaoke-dream"><img src="banner.png" width="100%" alt="karaoke-dream — штандарт мастерской в каноне ORNAMENTAL MYTHO-REALISM"></a>
+
+</div>
+
+<div align="center">
   <img src="https://cdn.jsdelivr.net/gh/rtynbirf/karaoke-dream@main/banner.png" alt="karaoke-dream — Браузерное караоке мечты: неон, гид-вокал, оценка голоса" width="100%">
 </div>
 
@@ -17,7 +23,7 @@
 
 | ФАЙЛОВ | ПАПОК | КОММИТОВ | ОБНОВЛЕНО | РЕЛИЗОВ |
 |---:|---:|---:|---|---:|
-| 86 | 18 | 123 | 2026-11-19 | 1 |
+| 86 | 18 | 124 | 2026-11-19 | 0 |
 <!--ФОРЖ:ПАСПОРТ:КОНЕЦ-->
 
 

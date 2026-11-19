@@ -10,7 +10,7 @@
 import hashlib, json, os, re, subprocess
 
 try:
-    CFG = json.loads(r'''{"name": "karaoke-dream", "num": 31, "school": "СЦЕНА СОФИТОВ", "desc": "Браузерное караоке мечты: неон, гид-вокал, оценка голоса в реальном времени и Зелёный коридор — тональность подстраивается под певца. Vanilla JS + WebAudio, zero-dependency.", "topics": ["javascript", "karaoke", "music", "real-time", "webaudio"], "releases": 1, "palette": {"bg": "#38100A", "bg2": "#4E1A10", "ink": "#F4E9D6", "gold": "#D4AF37", "gold2": "#E8C868", "dim": "#C39272", "accent": "#2C5F9E"}}''')
+    CFG = json.loads(r'''{"name": "karaoke-dream", "num": 29, "school": "НОВОСТРОЙ РОЯ", "desc": "Браузерное караоке мечты: неон, гид-вокал, оценка голоса в реальном времени и Зелёный коридор — тональность подстраивается под певца. Vanilla JS + WebAudio, zero-dependency.", "topics": ["javascript", "karaoke", "music", "pid1"], "releases": 0, "palette": {"bg": "#EFE6CF", "bg2": "#F6EFDC", "ink": "#241C10", "gold": "#9A7B23", "gold2": "#C9A227", "dim": "#6E6249", "accent": "#C43B27"}}''')
 except Exception:
     CFG = {"name": "REVO", "num": 0, "school": "", "desc": "", "topics": [], "releases": 0,
            "palette": dict(bg="#EFE6CF", bg2="#F6EFDC", ink="#241C10", gold="#9A7B23",
